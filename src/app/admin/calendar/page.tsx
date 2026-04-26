@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Plus, 
-  Clock, 
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Clock,
   User,
   MoreVertical,
   Calendar as CalendarIcon,
@@ -15,27 +15,39 @@ import {
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { Appointment, Service } from "@/lib/types";
 
 const daysOfWeek = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
 
 export default function CalendarPage() {
   const [selectedDay, setSelectedDay] = useState(new Date().getDate());
   const [view, setView] = useState<"month" | "week" | "day">("month");
-  const [dynamicAppointments, setDynamicAppointments] = useState<any[]>([]);
+  const [dynamicAppointments, setDynamicAppointments] = useState<Appointment[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchAppointments();
-  }, []);
-
-  const fetchAppointments = async () => {
-    const { data, error } = await supabase
+  const fetchAppointments = useCallback(async () => {
+    const { data } = await supabase
       .from('appointments')
       .select('*')
       .order('appointment_time', { ascending: true });
-    
-    if (data) setDynamicAppointments(data);
-  };
+
+    if (data) setDynamicAppointments(data as Appointment[]);
+  }, []);
+
+  const fetchServices = useCallback(async () => {
+    const { data } = await supabase
+      .from('services')
+      .select('*')
+      .order('name');
+    if (data) setServices(data as Service[]);
+  }, []);
+
+  useEffect(() => {
+    fetchAppointments();
+    fetchServices();
+  }, [fetchAppointments, fetchServices]);
 
   const getDayFromDate = (dateStr: string) => {
     if (!dateStr) return 0;
@@ -54,33 +66,45 @@ export default function CalendarPage() {
 
   const handleAddAppointment = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     const formData = new FormData(e.target as HTMLFormElement);
-    
-    // Instead of using Date.now() for ID, let Supabase auto-increment or handle it
+    const date = `2026-04-${selectedDay.toString().padStart(2, '0')}`;
+    const time = formData.get("appointment_time") as string;
+
+    // Check for conflicts
+    const hasConflict = dynamicAppointments.some(
+      apt => apt.appointment_date === date && apt.appointment_time === time
+    );
+
+    if (hasConflict) {
+      toast.error("Ce créneau est déjà occupé !");
+      setIsSubmitting(false);
+      return;
+    }
+
     const newApt = {
       client_name: formData.get("client_name") as string,
       service_name: formData.get("service_name") as string,
-      appointment_date: `2026-04-${selectedDay.toString().padStart(2, '0')}`,
-      appointment_time: formData.get("appointment_time") as string,
+      appointment_date: date,
+      appointment_time: time,
       status: "confirmed"
     };
-    
-    // Insert into Supabase
+
     const { data, error } = await supabase
       .from('appointments')
       .insert([newApt])
       .select();
-      
+
     if (error) {
-      toast.error("Erreur lors de l'ajout: " + error.message);
-      return;
-    }
-    
-    if (data && data.length > 0) {
+      toast.error("Erreur: " + error.message);
+    } else if (data && data.length > 0) {
       setDynamicAppointments([...dynamicAppointments, data[0]]);
       setIsModalOpen(false);
-      toast.success("Rendez-vous ajouté avec succès !");
+      toast.success("Rendez-vous ajouté com sucesso !");
     }
+    setIsSubmitting(false);
   };
 
   return (
@@ -97,7 +121,7 @@ export default function CalendarPage() {
               <button
                 key={v}
                 onClick={() => {
-                  setView(v as any);
+                  setView(v as "month" | "week" | "day");
                   toast.info(`Vue changée sur ${v === 'month' ? 'Mois' : v === 'week' ? 'Semaine' : 'Jour'}`);
                 }}
                 className={cn(
@@ -271,9 +295,15 @@ export default function CalendarPage() {
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Prestation</label>
                   <select required name="service_name" className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51] transition-all">
-                    <option>Manucure Russe</option>
-                    <option>Nail Art Autoral</option>
-                    <option>Allongement Gel</option>
+                    {services.length > 0 ? (
+                      services.map(s => <option key={s.id} value={s.name}>{s.name} ({s.price} €)</option>)
+                    ) : (
+                      <>
+                        <option>Manucure Russe</option>
+                        <option>Nail Art Autoral</option>
+                        <option>Allongement Gel</option>
+                      </>
+                    )}
                   </select>
                 </div>
 
@@ -288,8 +318,8 @@ export default function CalendarPage() {
                   </div>
                 </div>
 
-                <button type="submit" className="w-full py-4 mt-4 bg-[#e76f51] text-white rounded-xl font-bold shadow-lg shadow-[#e76f51]/20 hover:scale-[1.02] transition-transform">
-                  Confirmer le RDV
+                <button disabled={isSubmitting} type="submit" className="w-full py-4 mt-4 bg-[#e76f51] text-white rounded-xl font-bold shadow-lg shadow-[#e76f51]/20 hover:scale-[1.02] transition-transform disabled:opacity-50">
+                  {isSubmitting ? "Chargement..." : "Confirmer le RDV"}
                 </button>
               </form>
             </motion.div>

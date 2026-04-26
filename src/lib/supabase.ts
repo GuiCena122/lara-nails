@@ -7,7 +7,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholde
 // Validação extra para garantir que Vercel não quebre se a URL vier errada (ex: sem https://)
 try {
   new URL(supabaseUrl);
-} catch (e) {
+} catch {
   console.warn('Invalid SUPABASE_URL detected during build. Falling back to placeholder.');
   supabaseUrl = 'https://placeholder.supabase.co';
 }

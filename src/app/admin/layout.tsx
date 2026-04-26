@@ -1,31 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
-import { 
-  LayoutDashboard, 
-  MessageSquare, 
-  Calendar, 
-  Users, 
-  Settings, 
+import {
+  LayoutDashboard,
+  MessageSquare,
+  Calendar,
+  Users,
+  Settings,
   LogOut,
   Bell
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
   const [activeTab, setActiveTab] = useState("dashboard");
   const router = useRouter();
+  const supabase = createClient();
 
-  const handleLogout = () => {
-    toast.success("Déconnexion réussie");
-    router.push("/");
+  useEffect(() => {
+    const currentTab = menuItems.find(item => pathname === item.href || pathname.startsWith(item.href + '/'))?.id;
+    if (currentTab) setActiveTab(currentTab);
+  }, [pathname]);
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error("Erreur lors de la déconnexion");
+    } else {
+      toast.success("Déconnexion réussie");
+      router.push("/login");
+    }
   };
 
   const menuItems = [

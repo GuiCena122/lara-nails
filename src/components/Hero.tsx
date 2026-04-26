@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 export default function Hero() {
   return (
@@ -31,7 +32,7 @@ export default function Hero() {
           </h1>
 
           <p className="text-white/50 text-lg font-light leading-relaxed mb-10 max-w-md">
-            Manucure russe, nail art d'auteur et rituels de beauté premium dans un espace pensé pour l'excellence.
+            Manucure russe, nail art d&apos;auteur et rituels de beauté premium dans un espace pensé pour l&apos;excellence.
           </p>
 
           <div className="flex flex-wrap gap-4">
@@ -78,11 +79,14 @@ export default function Hero() {
           <div className="relative w-full max-w-[420px] lg:max-w-full lg:w-[480px] aspect-[3/4]">
             <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-[#e76f51]/20 to-transparent p-[1px]">
               <div className="w-full h-full rounded-[2.5rem] overflow-hidden bg-[#1a1a1a]">
-                <img
+                <Image
                   src="/lara-portrait.png"
                   alt="Lara — Studio de Beauté"
+                  width={480}
+                  height={640}
                   className="w-full h-full object-cover object-top"
                   style={{ imageRendering: "crisp-edges" }}
+                  priority
                 />
               </div>
             </div>

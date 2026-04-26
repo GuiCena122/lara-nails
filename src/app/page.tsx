@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 
@@ -57,9 +58,11 @@ export default function Home() {
 
             {/* Image side */}
             <motion.div {...fadeUp} className="relative">
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=900&auto=format&fit=crop"
                 alt="Ambiance studio"
+                width={900}
+                height={500}
                 className="w-full h-[500px] object-cover rounded-3xl"
               />
               {/* Coral overlay card */}
@@ -76,7 +79,7 @@ export default function Home() {
             <motion.div {...fadeUp} transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" as const }}>
               <span className="inline-block bg-[#e76f51]/10 text-[#e76f51] text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-6">Notre Studio</span>
               <h2 className="text-5xl md:text-6xl font-black leading-tight mb-6">
-                L'art de<br />sublimer vos<br />
+                L&apos;art de<br />sublimer vos<br />
                 <span className="text-[#e76f51]">mains.</span>
               </h2>
               <p className="text-white/50 text-base leading-relaxed mb-8 font-light">
@@ -157,9 +160,11 @@ export default function Home() {
                 transition={{ duration: 0.7, delay: i * 0.08, ease: "easeOut" }}
                 className={`overflow-hidden rounded-2xl group relative ${i === 0 || i === 5 ? "md:row-span-2" : ""}`}
               >
-                <img
+                <Image
                   src={src}
                   alt="Nail art"
+                  width={600}
+                  height={i === 0 || i === 5 ? 800 : 400}
                   className={`w-full object-cover group-hover:scale-110 transition-transform duration-700 ${i === 0 || i === 5 ? "h-[400px] md:h-full" : "h-[220px] md:h-[280px]"}`}
                 />
                 <div className="absolute inset-0 bg-[#e76f51]/0 group-hover:bg-[#e76f51]/10 transition-colors duration-500 rounded-2xl" />
@@ -178,7 +183,7 @@ export default function Home() {
             <motion.div {...fadeUp}>
               <span className="inline-block bg-[#e76f51]/10 text-[#e76f51] text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-6">Réservation</span>
               <h2 className="text-5xl md:text-6xl font-black mb-6 leading-tight">
-                Prête pour<br />l'expérience ?
+                Prête pour<br />l&apos;expérience ?
               </h2>
               <p className="text-white/50 font-light text-base leading-relaxed mb-10 max-w-sm">
                 Réservez votre créneau ou partagez vos inspirations pour un projet entièrement personnalisé.
@@ -245,7 +250,7 @@ export default function Home() {
             <span className="text-white font-bold text-sm">Lara <span className="text-[#e76f51]">Nails</span></span>
           </div>
           <p className="text-white/25 text-xs font-medium">© 2026 Lara Nails — Paris. Tous droits réservés.</p>
-          <p className="text-white/25 text-xs">L'excellence, toujours.</p>
+          <p className="text-white/25 text-xs">L&apos;excellence, toujours.</p>
         </div>
       </footer>
     </main>

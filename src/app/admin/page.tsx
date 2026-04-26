@@ -28,19 +28,15 @@ export default function AdminDashboard() {
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('appointments')
       .select('*')
       .order('created_at', { ascending: false });
-    
+
     if (data) {
       setAppointments(data);
-      
+
       // Calculate Stats
       const totalRevenue = data.reduce((acc, curr) => acc + Number(curr.price || 0), 0);
       const uniqueClients = new Set(data.map(a => a.client_email || a.client_phone)).size;
@@ -54,6 +50,10 @@ export default function AdminDashboard() {
       ]);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const displayAppointments = appointments.slice(0, 5); // Show last 5
 
