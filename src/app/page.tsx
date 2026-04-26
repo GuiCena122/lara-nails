@@ -70,7 +70,7 @@ export default function Home() {
                 <div className="w-12 h-12 rounded-2xl bg-[#e76f51] flex items-center justify-center text-2xl flex-shrink-0">✨</div>
                 <div>
                   <p className="font-bold text-white">Technique Russe Certifiée</p>
-                  <p className="text-white/50 text-sm">L'hygiène clinique au service de la beauté</p>
+                  <p className="text-white/50 text-sm">L&apos;hygiène clinique au service de la beauté</p>
                 </div>
               </div>
             </motion.div>
@@ -112,7 +112,7 @@ export default function Home() {
               <span className="inline-block bg-[#e76f51]/10 text-[#e76f51] text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-4">Prestations</span>
               <h2 className="text-5xl md:text-6xl font-black">Nos Soins</h2>
             </div>
-            <p className="text-white/40 text-sm font-light max-w-xs">Chaque soin est adapté à la morphologie et aux désirs de la cliente.</p>
+            <p className="text-white/40 text-sm font-light max-w-xs">Chaque soin est adapté à la morphologie et aos desejos da cliente.</p>
           </motion.div>
 
           <div className="space-y-3">

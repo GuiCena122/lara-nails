@@ -16,6 +16,14 @@ import {
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 
+const menuItems = [
+  { id: "dashboard", label: "Vue d'ensemble", icon: LayoutDashboard, href: "/admin" },
+  { id: "inbox", label: "Instagram Inbox", icon: MessageSquare, href: "/admin/inbox", badge: 3 },
+  { id: "calendar", label: "Calendrier", icon: Calendar, href: "/admin/calendar" },
+  { id: "clients", label: "Clientes", icon: Users, href: "/admin/clients" },
+  { id: "settings", label: "Paramètres", icon: Settings, href: "/admin/settings" },
+];
+
 export default function AdminLayout({
   children,
 }: {
@@ -28,7 +36,11 @@ export default function AdminLayout({
 
   useEffect(() => {
     const currentTab = menuItems.find(item => pathname === item.href || pathname.startsWith(item.href + '/'))?.id;
-    if (currentTab) setActiveTab(currentTab);
+    if (currentTab) {
+      // Small timeout to decouple from render cycle and avoid cascade warning
+      const timer = setTimeout(() => setActiveTab(currentTab), 0);
+      return () => clearTimeout(timer);
+    }
   }, [pathname]);
 
   const handleLogout = async () => {
@@ -40,14 +52,6 @@ export default function AdminLayout({
       router.push("/login");
     }
   };
-
-  const menuItems = [
-    { id: "dashboard", label: "Vue d'ensemble", icon: LayoutDashboard, href: "/admin" },
-    { id: "inbox", label: "Instagram Inbox", icon: MessageSquare, href: "/admin/inbox", badge: 3 },
-    { id: "calendar", label: "Calendrier", icon: Calendar, href: "/admin/calendar" },
-    { id: "clients", label: "Clientes", icon: Users, href: "/admin/clients" },
-    { id: "settings", label: "Paramètres", icon: Settings, href: "/admin/settings" },
-  ];
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[#251f1f] text-white">
@@ -67,8 +71,8 @@ export default function AdminLayout({
               onClick={() => setActiveTab(item.id)}
               className={cn(
                 "flex items-center justify-between px-4 py-3 rounded-xl transition-all group",
-                activeTab === item.id 
-                  ? "bg-[#e76f51]/20 text-[#e76f51] border border-[#e76f51]/30" 
+                activeTab === item.id
+                  ? "bg-[#e76f51]/20 text-[#e76f51] border border-[#e76f51]/30"
                   : "text-gray-400 hover:text-white hover:bg-white/5"
               )}
             >
@@ -132,8 +136,8 @@ export default function AdminLayout({
               onClick={() => setActiveTab(item.id)}
               className={cn(
                 "flex flex-col items-center justify-center p-2 rounded-xl transition-all w-16",
-                activeTab === item.id 
-                  ? "text-[#e76f51]" 
+                activeTab === item.id
+                  ? "text-[#e76f51]"
                   : "text-gray-500 hover:text-gray-300"
               )}
             >

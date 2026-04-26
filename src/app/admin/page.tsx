@@ -17,6 +17,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Download } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export default function AdminDashboard() {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [stats, setStats] = useState([

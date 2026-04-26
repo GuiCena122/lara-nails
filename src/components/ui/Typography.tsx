@@ -8,7 +8,7 @@ interface TypographyProps extends React.HTMLAttributes<HTMLElement> {
 
 const Typography = React.forwardRef<HTMLElement, TypographyProps>(
   ({ className, variant = "p", serif = false, ...props }, ref) => {
-    const Component = variant as any;
+    const Component = variant as React.ElementType;
 
     const styles = {
       h1: "text-5xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.1]",

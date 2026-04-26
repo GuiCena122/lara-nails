@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Upload as UploadIcon, X, FileImage } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Upload as UploadIcon, X } from "lucide-react";
 import { Typography } from "./Typography";
 
 export function Upload() {
@@ -22,6 +21,7 @@ export function Upload() {
       <label className="relative group flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-brand-gold/20 rounded-[2.5rem] bg-white/5 hover:bg-brand-gold/5 transition-all cursor-pointer overflow-hidden">
         {preview ? (
           <div className="absolute inset-0 w-full h-full">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={preview} alt="Preview" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-brand-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <Typography variant="span" className="text-white font-bold">Changer l&apos;image</Typography>

@@ -29,6 +29,8 @@ const messages = [
   { id: 3, text: "Je voudrais agender un Allongement Gel pour samedi prochain. Est-ce possible ?", sent: false, time: "12:30" },
 ];
 
+export const dynamic = 'force-dynamic';
+
 export default function InboxPage() {
   const [selectedContact, setSelectedContact] = useState(contacts[0]);
   const [msgInput, setMsgInput] = useState("");

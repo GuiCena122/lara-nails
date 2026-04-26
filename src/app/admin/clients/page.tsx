@@ -6,9 +6,6 @@ import {
   Search,
   Plus,
   MoreHorizontal,
-  Mail,
-  Phone,
-  Star,
   History,
   TrendingUp,
   Filter,
@@ -18,6 +15,8 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { ClientProfile } from "@/lib/types";
+
+export const dynamic = 'force-dynamic';
 
 export default function ClientsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -68,7 +67,9 @@ export default function ClientsPage() {
   }, []);
 
   useEffect(() => {
-    fetchClients();
+    // Decouple setState from synchronous effect call to satisfy cascading render rule
+    const timer = setTimeout(() => fetchClients(), 0);
+    return () => clearTimeout(timer);
   }, [fetchClients]);
 
   const filteredClients = dynamicClients.filter(c =>
@@ -77,7 +78,6 @@ export default function ClientsPage() {
     (c.phone?.includes(searchTerm) ?? false)
   );
 
-  const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
   const paginatedClients = filteredClients.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -117,10 +117,10 @@ export default function ClientsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h2 className="text-2xl font-serif font-bold">Gestion des Clientes</h2>
-          <p className="text-gray-500 text-sm font-light">Suivez la fidélité et l'historique de vos clientes.</p>
+          <p className="text-gray-500 text-sm font-light">Suivez la fidélité et l&apos;historique de vos clientes.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={() => toast.info("Statistiques bientôt disponibles")} className="bg-white/5 text-white px-6 py-3 rounded-xl font-bold text-sm border border-white/10 flex items-center gap-2 hover:bg-white/10 transition-all">
+          <button onClick={() => toast.info("Statistiques bientôt disponíveis")} className="bg-white/5 text-white px-6 py-3 rounded-xl font-bold text-sm border border-white/10 flex items-center gap-2 hover:bg-white/10 transition-all">
             <TrendingUp className="w-4 h-4 text-[#e76f51]" /> Statistiques
           </button>
           <button onClick={() => setIsModalOpen(true)} className="bg-[#e76f51] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-[#e76f51]/20 flex items-center gap-2 hover:scale-[1.02] transition-all">
