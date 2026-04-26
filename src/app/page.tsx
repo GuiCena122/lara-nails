@@ -1,232 +1,302 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MapPin } from "lucide-react";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+
+const GOLD = "#C9A05C";
+const DARK = "#2C1A0E";
+const CREAM = "#F5EFE6";
+const MUTED = "#EDE0D4";
 
 export default function Home() {
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
-    const btn = form.querySelector('button');
+    const btn = form.querySelector("button[type='submit']") as HTMLButtonElement | null;
     if (btn) btn.disabled = true;
 
     toast.promise(
-      new Promise((resolve) => setTimeout(resolve, 1500)),
+      new Promise((resolve) => setTimeout(resolve, 1800)),
       {
-        loading: 'Transmission en cours...',
+        loading: "Transmission en cours...",
         success: () => {
           form.reset();
           if (btn) btn.disabled = false;
-          return 'Votre demande a été reçue avec succès.';
+          return "Votre demande a été reçue. Nous vous contacterons très prochainement.";
         },
         error: () => {
           if (btn) btn.disabled = false;
-          return 'Erreur de transmission';
+          return "Erreur lors de l'envoi. Veuillez réessayer.";
         },
       }
     );
   };
 
+  const fadeUp = {
+    initial: { opacity: 0, y: 30 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true, margin: "-80px" } as const,
+    transition: { duration: 1.4, ease: "easeOut" as const },
+  };
+
   return (
-    <main className="min-h-screen bg-white text-[#111111] selection:bg-[#111111] selection:text-white">
-      
+    <main className="bg-[#F5EFE6] text-[#2C1A0E] selection:bg-[#C9A05C] selection:text-[#2C1A0E]">
       <Navbar />
       <Hero />
 
-      {/* Philosophy Section */}
-      <section id="philosophy" className="py-40 bg-[#fafafa]">
-        <div className="max-w-4xl mx-auto px-8 md:px-16 text-center">
-          <motion.p 
+      {/* ── MANIFESTE ─────────────────────────────── */}
+      <section id="philosophy" className="py-40 bg-[#F5EFE6] relative overflow-hidden">
+        {/* Decorative large letter */}
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 text-[28rem] font-serif italic text-[#EDE0D4] select-none pointer-events-none leading-none">L</div>
+
+        <div className="max-w-5xl mx-auto px-8 md:px-16 relative z-10">
+          <div className="grid md:grid-cols-2 gap-20 items-center">
+            <motion.div {...fadeUp}>
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-8 h-[1px] bg-[#C9A05C]" />
+                <p className="text-[10px] uppercase tracking-[0.32em] text-[#C9A05C] font-medium">Le Manifeste</p>
+              </div>
+              <h2 className="font-serif text-4xl md:text-6xl text-[#2C1A0E] leading-[1.15] mb-10">
+                Beauté & <br /><em className="italic font-light">Précision</em><br />Sans Compromis.
+              </h2>
+              <div className="w-24 h-[1px] bg-[#C9A05C] mb-10" />
+              <p className="text-[#2C1A0E]/70 font-sans font-light text-base leading-loose max-w-md">
+                Chez Lara Nails, chaque geste est une signature. Formées aux techniques les plus exigeantes, nos artistes combinent savoir-faire clinique et sensibilité artistique pour révéler le meilleur de vos mains.
+              </p>
+            </motion.div>
+
+            <motion.div {...fadeUp} transition={{ duration: 1.4, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}>
+              <div className="relative">
+                <img
+                  src="https://images.unsplash.com/photo-1519014816548-bf5fe059e98b?q=80&w=800&auto=format&fit=crop"
+                  alt="Soin manucure"
+                  className="w-full h-[500px] object-cover"
+                />
+                {/* Gold border offset */}
+                <div className="absolute -bottom-4 -right-4 w-full h-full border border-[#C9A05C]/40 pointer-events-none" />
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Stats row */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-            className="text-[9px] uppercase tracking-[0.3em] text-[#111111]/50 mb-12 font-medium"
+            viewport={{ once: true }}
+            transition={{ duration: 1.4, delay: 0.3 }}
+            className="grid grid-cols-3 gap-0 mt-28 border-t border-[#C9A05C]/30 pt-12"
           >
-            Le Manifeste
-          </motion.p>
-          
-          <motion.h2 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="font-serif text-3xl md:text-5xl lg:text-6xl mb-12 leading-[1.2]"
-          >
-            L'excellence n'est pas un acte,<br />
-            <span className="italic font-light">mais une habitude.</span>
-          </motion.h2>
-          
-          <motion.p 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 2, delay: 0.4 }}
-            className="text-[#111111]/60 text-sm md:text-base font-light leading-loose max-w-2xl mx-auto"
-          >
-            Chez Lara Nails, chaque prestation est exécutée avec la rigueur d'une clinique et le raffinement d'un atelier d'art. La manucure russe n'est pas simplement une technique, c'est notre engagement envers la santé absolue de l'ongle et une esthétique irréprochable.
-          </motion.p>
-        </div>
-      </section>
-
-      {/* Services Section */}
-      <section id="services" className="py-40 bg-white">
-        <div className="max-w-[1000px] mx-auto px-8 md:px-16">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-24 border-b border-[#111111]/10 pb-12">
-            <div>
-              <p className="text-[9px] uppercase tracking-[0.3em] text-[#111111]/50 mb-6 font-medium">Prestations</p>
-              <h2 className="font-serif text-5xl md:text-6xl text-[#111111]">Le Menu</h2>
-            </div>
-          </div>
-
-          <div className="space-y-12">
             {[
-              { name: "Manucure Russe Signature", price: "50€", desc: "Soin complet des cuticules, forme parfaite et hydratation profonde." },
-              { name: "Gainage & Semi-Permanent", price: "65€", desc: "Renforcement de l'ongle naturel pour une tenue prolongée." },
-              { name: "Extension Gel (Chablon)", price: "85€", desc: "Allongement sur mesure, architecture parfaite." },
-              { name: "Nail Art Autoral", price: "Dès 15€", desc: "Minimalisme et précision à main levée." }
-            ].map((service, index) => (
-              <motion.div 
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1.5, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className="group flex flex-col md:flex-row justify-between items-start md:items-center relative"
-              >
-                <div className="flex-1 bg-white relative z-10 pr-8">
-                  <h3 className="text-xl md:text-2xl font-serif text-[#111111] mb-2">{service.name}</h3>
-                  <p className="text-xs text-[#111111]/50 font-light tracking-wide uppercase">{service.desc}</p>
-                </div>
-                
-                {/* Dotted line connector */}
-                <div className="hidden md:block absolute left-0 right-0 top-1/2 border-t border-dotted border-[#111111]/20 z-0" />
-                
-                <div className="mt-4 md:mt-0 bg-white relative z-10 pl-8 text-lg font-medium text-[#111111] group-hover:text-[#e76f51] transition-colors duration-500">
-                  {service.price}
-                </div>
-              </motion.div>
+              { num: "500+", label: "Clientes fidèles" },
+              { num: "5★", label: "Note Google" },
+              { num: "100%", label: "Produits premium" },
+            ].map((s, i) => (
+              <div key={i} className={`text-center py-4 ${i < 2 ? "border-r border-[#C9A05C]/30" : ""}`}>
+                <p className="font-serif text-5xl italic text-[#C9A05C] mb-2">{s.num}</p>
+                <p className="text-[10px] uppercase tracking-[0.25em] text-[#2C1A0E]/60 font-sans">{s.label}</p>
+              </div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Gallery Section */}
-      <section id="gallery" className="py-40 bg-[#fafafa]">
-        <div className="max-w-[1400px] mx-auto px-8 md:px-16">
-          <div className="text-center mb-24">
-            <p className="text-[9px] uppercase tracking-[0.3em] text-[#111111]/50 mb-6 font-medium">Inspiration</p>
-            <h2 className="font-serif text-5xl md:text-6xl text-[#111111]">L'Éditorial</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      {/* ── SERVICES ─────────────────────────────── */}
+      <section id="services" className="py-40 bg-[#2C1A0E] relative overflow-hidden">
+        {/* Gold top border */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#C9A05C] to-transparent" />
+
+        <div className="max-w-[1100px] mx-auto px-8 md:px-16">
+          <motion.div {...fadeUp} className="flex flex-col md:flex-row justify-between items-start md:items-end mb-24">
+            <div>
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-8 h-[1px] bg-[#C9A05C]" />
+                <p className="text-[10px] uppercase tracking-[0.32em] text-[#C9A05C] font-medium">Prestations</p>
+              </div>
+              <h2 className="font-serif text-5xl md:text-7xl text-[#F5EFE6] italic font-light leading-tight">
+                Le Menu
+              </h2>
+            </div>
+            <p className="text-[#F5EFE6]/40 font-sans font-light text-sm mt-4 md:mt-0 max-w-xs text-right leading-relaxed">
+              Chaque soin est personnalisé selon la morphologie et les désirs de la cliente.
+            </p>
+          </motion.div>
+
+          <div className="space-y-0">
             {[
-              "https://images.unsplash.com/photo-1599839619722-39751411ea63?q=80&w=600&auto=format&fit=crop",
-              "https://images.unsplash.com/photo-1516975080661-460d3c01c0f9?q=80&w=600&auto=format&fit=crop",
-              "https://images.unsplash.com/photo-1620002131971-ce4a9c68fc0e?q=80&w=600&auto=format&fit=crop",
-              "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=600&auto=format&fit=crop"
-            ].map((src, i) => (
-              <motion.div 
+              { name: "Manucure Russe Signature", price: "50 €", desc: "Soin cuticule parfait, forme architecturale, hydratation intense." },
+              { name: "Gainage & Semi-Permanent", price: "65 €", desc: "Renforcement de l'ongle naturel — résultat impeccable 4 semaines." },
+              { name: "Extension Gel sur Chablon", price: "85 €", desc: "Allongement sur-mesure. Architecture parfaite, résultat ultra-naturel." },
+              { name: "Nail Art Autoral", price: "Dès 15 €", desc: "Minimalisme, textures, aquarelle — chaque détail est une œuvre." },
+            ].map((service, i) => (
+              <motion.div
                 key={i}
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 2, delay: i * 0.2 }}
-                className="overflow-hidden group"
+                transition={{ duration: 1.2, delay: i * 0.1 }}
+                className="group grid grid-cols-12 gap-4 py-10 border-b border-[#F5EFE6]/10 hover:border-[#C9A05C]/40 transition-colors duration-700 items-center"
               >
-                <img 
-                  src={src} 
-                  alt="Nail Gallery" 
-                  className="w-full h-[400px] md:h-[500px] object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-1000 ease-[0.16,1,0.3,1] scale-[1.01] group-hover:scale-105" 
+                <div className="col-span-1 text-[#C9A05C]/40 font-serif text-2xl italic group-hover:text-[#C9A05C] transition-colors duration-500">
+                  {String(i + 1).padStart(2, "0")}
+                </div>
+                <div className="col-span-7 md:col-span-8">
+                  <h3 className="font-serif text-2xl md:text-3xl italic text-[#F5EFE6] mb-2 group-hover:text-[#C9A05C] transition-colors duration-500">
+                    {service.name}
+                  </h3>
+                  <p className="text-[#F5EFE6]/40 font-sans text-xs leading-relaxed uppercase tracking-widest">
+                    {service.desc}
+                  </p>
+                </div>
+                <div className="col-span-4 md:col-span-3 text-right">
+                  <span className="font-serif text-2xl text-[#C9A05C]">{service.price}</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Gold bottom border */}
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#C9A05C] to-transparent" />
+      </section>
+
+      {/* ── GALERIE ─────────────────────────────── */}
+      <section id="gallery" className="py-40 bg-[#EDE0D4]">
+        <div className="max-w-[1400px] mx-auto px-8 md:px-16">
+          <motion.div {...fadeUp} className="text-center mb-24">
+            <div className="flex items-center justify-center gap-6 mb-6">
+              <div className="w-12 h-[1px] bg-[#C9A05C]" />
+              <p className="text-[10px] uppercase tracking-[0.32em] text-[#C9A05C] font-medium">Inspiration</p>
+              <div className="w-12 h-[1px] bg-[#C9A05C]" />
+            </div>
+            <h2 className="font-serif text-5xl md:text-7xl text-[#2C1A0E] italic font-light">L'Éditorial</h2>
+          </motion.div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+            {[
+              { src: "https://images.unsplash.com/photo-1599839619722-39751411ea63?q=80&w=600", tall: true },
+              { src: "https://images.unsplash.com/photo-1516975080661-460d3c01c0f9?q=80&w=600", tall: false },
+              { src: "https://images.unsplash.com/photo-1620002131971-ce4a9c68fc0e?q=80&w=600", tall: false },
+              { src: "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=600", tall: true },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.4, delay: i * 0.15 }}
+                className={`overflow-hidden relative group ${i % 2 === 1 ? "md:mt-10" : ""}`}
+              >
+                <img
+                  src={item.src}
+                  alt="Nail art"
+                  className="w-full h-[300px] md:h-[450px] object-cover group-hover:scale-105 transition-transform duration-1000 ease-[0.16,1,0.3,1]"
                 />
+                {/* Gold frame on hover */}
+                <div className="absolute inset-0 border border-[#C9A05C]/0 group-hover:border-[#C9A05C]/60 transition-all duration-700" />
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Contact / Footer */}
-      <section id="contact" className="py-40 bg-[#111111] text-white">
-        <div className="max-w-[1200px] mx-auto px-8 md:px-16 grid lg:grid-cols-2 gap-24 items-center">
-          
-          <div>
-            <p className="text-[9px] uppercase tracking-[0.3em] text-white/40 mb-8 font-medium">
-              Réservation
-            </p>
-            <h2 className="font-serif text-5xl md:text-7xl mb-12 text-white leading-[1.1]">
-              L'Expérience<br />Sur-Mesure
-            </h2>
-            <p className="text-white/60 font-light mb-16 max-w-sm text-sm leading-loose">
-              Contactez-nous pour réserver votre créneau exclusif ou pour une consultation personnalisée.
-            </p>
-            
-            <div className="space-y-8">
-              <div className="flex items-center gap-6 group">
-                <span className="w-8 h-[1px] bg-white/20 group-hover:bg-[#e76f51] transition-colors duration-500" />
-                <span className="font-light text-sm uppercase tracking-widest text-white/80">12 Avenue de l'Élégance, Paris</span>
-              </div>
-              <div className="flex items-center gap-6 group">
-                <span className="w-8 h-[1px] bg-white/20 group-hover:bg-[#e76f51] transition-colors duration-500" />
-                <a href="#" className="font-light text-sm uppercase tracking-widest text-white/80 hover:text-white transition-colors duration-500">@lara.nails.pro</a>
-              </div>
-            </div>
-          </div>
+      {/* ── CONTACT ─────────────────────────────── */}
+      <section id="contact" className="py-40 bg-[#2C1A0E] relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#C9A05C] to-transparent" />
+        
+        {/* Large background watermark */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
+          <span className="text-[22rem] font-serif italic text-[#F5EFE6]/[0.02]">L</span>
+        </div>
 
-          <div className="bg-[#1a1a1a] p-10 md:p-16 border border-white/5">
-            <h3 className="text-sm uppercase tracking-[0.2em] font-medium text-white mb-12">Demande de Consultation</h3>
-            <form onSubmit={handleContactSubmit} className="space-y-10">
-              <div>
-                <input 
-                  required 
-                  type="text" 
-                  placeholder="NOM COMPLET" 
-                  className="w-full bg-transparent border-b border-white/20 pb-4 outline-none focus:border-white transition-colors text-white text-[10px] tracking-[0.2em] uppercase placeholder:text-white/30" 
-                />
+        <div className="max-w-[1200px] mx-auto px-8 md:px-16 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-24 items-start">
+
+            {/* Left column */}
+            <motion.div {...fadeUp}>
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-8 h-[1px] bg-[#C9A05C]" />
+                <p className="text-[10px] uppercase tracking-[0.32em] text-[#C9A05C] font-medium">Rendez-vous</p>
               </div>
-              <div>
-                <input 
-                  required 
-                  type="tel" 
-                  placeholder="TÉLÉPHONE" 
-                  className="w-full bg-transparent border-b border-white/20 pb-4 outline-none focus:border-white transition-colors text-white text-[10px] tracking-[0.2em] uppercase placeholder:text-white/30" 
-                />
+              <h2 className="font-serif text-5xl md:text-7xl text-[#F5EFE6] italic font-light leading-[1.1] mb-10">
+                Votre<br />Expérience<br /><em className="text-[#C9A05C]">sur-mesure</em>
+              </h2>
+              <p className="text-[#F5EFE6]/50 font-sans font-light text-sm leading-loose mb-14 max-w-sm">
+                Réservez votre créneau exclusif ou partagez vos inspirations pour un projet unique.
+              </p>
+
+              <div className="space-y-6">
+                {[
+                  { label: "12 Avenue de l'Élégance, Paris" },
+                  { label: "@lara.nails.pro" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-5 group">
+                    <div className="w-10 h-[1px] bg-[#C9A05C]/30 group-hover:bg-[#C9A05C] transition-colors duration-500" />
+                    <span className="text-[#F5EFE6]/60 font-sans text-xs uppercase tracking-[0.2em]">{item.label}</span>
+                  </div>
+                ))}
               </div>
-              <div>
-                <select 
-                  required 
-                  className="w-full bg-transparent border-b border-white/20 pb-4 outline-none focus:border-white transition-colors text-white/80 text-[10px] tracking-[0.2em] uppercase appearance-none"
+            </motion.div>
+
+            {/* Form */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.4, delay: 0.2 }}
+              className="border border-[#C9A05C]/20 p-10 md:p-14"
+            >
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[#C9A05C] mb-10">Formulaire de Réservation</p>
+
+              <form onSubmit={handleContactSubmit} className="space-y-8">
+                {[
+                  { type: "text", placeholder: "Nom & Prénom", required: true },
+                  { type: "tel", placeholder: "Téléphone", required: true },
+                  { type: "email", placeholder: "E-mail", required: false },
+                ].map((field, i) => (
+                  <div key={i} className="border-b border-[#F5EFE6]/15 focus-within:border-[#C9A05C] transition-colors duration-500 pb-3">
+                    <input
+                      type={field.type}
+                      placeholder={field.placeholder}
+                      required={field.required}
+                      className="w-full bg-transparent text-[#F5EFE6] text-xs uppercase tracking-[0.2em] outline-none placeholder:text-[#F5EFE6]/25 font-sans"
+                    />
+                  </div>
+                ))}
+
+                <div className="border-b border-[#F5EFE6]/15 focus-within:border-[#C9A05C] transition-colors duration-500 pb-3">
+                  <select
+                    required
+                    defaultValue=""
+                    className="w-full bg-transparent text-[#F5EFE6]/60 text-xs uppercase tracking-[0.2em] outline-none appearance-none font-sans cursor-pointer"
+                  >
+                    <option value="" disabled>Prestation souhaitée</option>
+                    <option className="text-black bg-white">Manucure Russe</option>
+                    <option className="text-black bg-white">Gainage & Semi-Permanent</option>
+                    <option className="text-black bg-white">Extension Gel</option>
+                    <option className="text-black bg-white">Nail Art</option>
+                  </select>
+                </div>
+
+                <button
+                  type="submit"
+                  className="group w-full mt-4 bg-[#C9A05C] text-[#2C1A0E] py-5 text-[11px] uppercase tracking-[0.25em] font-bold hover:bg-[#F5EFE6] transition-colors duration-500 flex items-center justify-center gap-4"
                 >
-                  <option value="" disabled selected>SERVICE SOUHAITÉ</option>
-                  <option className="text-black">Manucure Russe</option>
-                  <option className="text-black">Gainage</option>
-                  <option className="text-black">Extension</option>
-                </select>
-              </div>
-              
-              <button 
-                type="submit" 
-                className="w-full pt-8 group flex items-center justify-between"
-              >
-                <span className="text-[10px] uppercase tracking-[0.3em] font-medium text-white group-hover:text-[#e76f51] transition-colors duration-500">
-                  Envoyer la demande
-                </span>
-                <span className="w-12 h-[1px] bg-white/40 group-hover:bg-[#e76f51] group-hover:w-20 transition-all duration-700 ease-[0.16,1,0.3,1]" />
-              </button>
-            </form>
+                  Envoyer ma demande
+                  <span className="w-6 h-[1px] bg-[#2C1A0E] group-hover:w-10 transition-all duration-700" />
+                </button>
+              </form>
+            </motion.div>
           </div>
         </div>
-        
-        <div className="max-w-[1200px] mx-auto px-8 md:px-16 mt-40 pt-10 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-[9px] font-medium tracking-[0.3em] uppercase text-white/30">
-            © 2026 LARA NAILS
-          </p>
-          <p className="text-[9px] font-medium tracking-[0.3em] uppercase text-white/30">
-            PARIS
-          </p>
+
+        {/* Footer bar */}
+        <div className="max-w-[1200px] mx-auto px-8 md:px-16 mt-28 pt-8 border-t border-[#F5EFE6]/10 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="font-serif italic text-[#F5EFE6]/20 text-sm">Lara Nails</p>
+          <p className="text-[9px] uppercase tracking-[0.3em] text-[#F5EFE6]/20">© 2026 — Paris — Tous droits réservés</p>
+          <p className="text-[9px] uppercase tracking-[0.3em] text-[#C9A05C]/40">L'Excellence sans compromis</p>
         </div>
       </section>
     </main>

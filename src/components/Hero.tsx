@@ -4,65 +4,93 @@ import { motion } from "framer-motion";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen bg-white flex items-center justify-center pt-24 pb-12 overflow-hidden">
+    <section className="relative min-h-screen bg-[#2C1A0E] flex items-end overflow-hidden">
       
-      <div className="max-w-[1400px] w-full mx-auto px-8 md:px-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-center">
-        
-        {/* Left: Image (7 columns) */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
-          className="lg:col-span-6 xl:col-span-7 relative h-[60vh] lg:h-[80vh] w-full order-2 lg:order-1"
+      {/* Gold shimmer top border */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C9A05C] to-transparent z-20" />
+
+      {/* Full bleed portrait */}
+      <motion.div
+        initial={{ opacity: 0, scale: 1.05 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 2.5, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute inset-0 z-0"
+      >
+        <img
+          src="/lara-portrait.png"
+          alt="Lara — Studio de Beauté"
+          className="w-full h-full object-cover object-top"
+        />
+        {/* Rich gradient overlay — dark mahogany from bottom */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#2C1A0E] via-[#2C1A0E]/60 to-[#2C1A0E]/20" />
+        {/* Subtle left vignette */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#2C1A0E]/70 via-transparent to-transparent" />
+      </motion.div>
+
+      {/* Gold corner ornament top-right */}
+      <div className="absolute top-28 right-16 hidden lg:block z-10 opacity-40">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <path d="M0 0 L80 0 L80 80" stroke="#C9A05C" strokeWidth="1" fill="none" />
+          <path d="M20 0 L80 0 L80 60" stroke="#C9A05C" strokeWidth="0.5" fill="none" />
+        </svg>
+      </div>
+
+      {/* Main Content */}
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-8 md:px-16 pb-24 md:pb-36">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-2xl"
         >
-          <div className="w-full h-full relative overflow-hidden bg-[#fafafa]">
-            <img 
-              src="/lara-portrait.png" 
-              alt="Portrait de Lara" 
-              className="w-full h-full object-cover object-top grayscale-[20%]"
-            />
+          {/* Gold eyebrow */}
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-10 h-[1px] bg-[#C9A05C]" />
+            <p className="text-[10px] uppercase tracking-[0.35em] text-[#C9A05C] font-medium">
+              Studio de Beauté d'Exception
+            </p>
           </div>
-          {/* Very thin architectural line */}
-          <div className="absolute top-10 -right-8 w-16 h-[1px] bg-[#111111]/30 hidden lg:block" />
-          <div className="absolute bottom-10 -left-8 w-16 h-[1px] bg-[#111111]/30 hidden lg:block" />
+
+          {/* Main title */}
+          <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl text-[#F5EFE6] leading-[1.0] mb-8">
+            L'Art<br />
+            <em className="italic font-light text-[#C9A05C]">Sublime</em><br />
+            <span className="font-light">du Soin.</span>
+          </h1>
+
+          <p className="text-[#F5EFE6]/70 text-base md:text-lg font-light leading-loose mb-12 max-w-md font-sans">
+            Une expérience sensorielle unique. Manucure russe, nail art d'auteur et rituels de beauté dans un cadre d'exception.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-6">
+            <a
+              href="#contact"
+              className="group inline-flex items-center gap-4 bg-[#C9A05C] text-[#2C1A0E] px-8 py-5 text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-[#F5EFE6] transition-colors duration-500"
+            >
+              Réserver
+              <span className="w-6 h-[1px] bg-[#2C1A0E] group-hover:w-10 transition-all duration-700" />
+            </a>
+            <a
+              href="#services"
+              className="inline-flex items-center gap-4 border border-[#F5EFE6]/30 text-[#F5EFE6]/80 px-8 py-5 text-[11px] uppercase tracking-[0.2em] font-medium hover:border-[#C9A05C] hover:text-[#C9A05C] transition-all duration-500"
+            >
+              Découvrir
+            </a>
+          </div>
         </motion.div>
 
-        {/* Right: Text Content (5 columns) */}
-        <div className="lg:col-span-6 xl:col-span-5 flex flex-col justify-center order-1 lg:order-2 z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <p className="text-[9px] uppercase tracking-[0.3em] text-[#111111]/50 mb-8 font-medium">
-              Paris
-            </p>
-            
-            <h1 className="font-serif text-5xl md:text-7xl lg:text-7xl xl:text-8xl text-[#111111] leading-[1.05] tracking-tight mb-8">
-              L'Art <br />
-              de la <br />
-              <span className="italic font-light text-[#111111]/80">Précision.</span>
-            </h1>
-            
-            <div className="w-12 h-[1px] bg-[#111111]/20 mb-10" />
-
-            <p className="text-[#111111]/60 text-sm md:text-base font-light leading-loose mb-12 max-w-md">
-              Une approche architecturale du soin des mains. 
-              Minimalisme, hygiène clinique et esthétique intemporelle pour celles qui exigent l'excellence.
-            </p>
-
-            <a 
-              href="#contact"
-              className="group inline-flex items-center gap-6"
-            >
-              <span className="text-[10px] uppercase tracking-[0.2em] text-[#111111] font-medium group-hover:text-[#e76f51] transition-colors duration-500">
-                Prendre Rendez-vous
-              </span>
-              <span className="w-12 h-[1px] bg-[#111111] group-hover:w-20 group-hover:bg-[#e76f51] transition-all duration-700 ease-[0.16,1,0.3,1]" />
-            </a>
-          </motion.div>
-        </div>
-
+        {/* Bottom gold badge */}
+        <motion.div
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1.8, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute bottom-24 right-16 hidden lg:flex flex-col items-end gap-2"
+        >
+          <div className="w-16 h-16 border border-[#C9A05C]/40 flex items-center justify-center">
+            <span className="text-[#C9A05C] text-2xl font-serif italic">L</span>
+          </div>
+          <p className="text-[9px] uppercase tracking-[0.3em] text-[#C9A05C]/60">Paris</p>
+        </motion.div>
       </div>
     </section>
   );
