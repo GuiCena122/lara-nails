@@ -40,6 +40,10 @@
     @apply bg-[#251f1f]/80 backdrop-blur-xl border border-white/5;
   }
   
+  .glass-light {
+    @apply bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(231,111,81,0.1)];
+  }
+  
   .gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-br from-[#e76f51] to-[#f4a261];
   }
