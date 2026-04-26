@@ -62,11 +62,11 @@ export default function Hero() {
           className="relative h-[60vh] lg:h-[80vh] w-full"
         >
           {/* Main Large Image */}
-          <div className="absolute top-0 right-0 w-4/5 h-4/5 bg-[#f4a261]/20 rounded-t-full overflow-hidden shadow-2xl">
+          <div className="absolute top-0 right-0 w-4/5 h-4/5 bg-white/50 rounded-t-full overflow-hidden shadow-2xl">
             <img 
-              src="https://images.unsplash.com/photo-1519014816548-bf5fe059e98b?q=80&w=1000&auto=format&fit=crop" 
-              alt="Manicure detail" 
-              className="w-full h-full object-cover mix-blend-multiply opacity-90"
+              src="/lara-portrait.png" 
+              alt="Portrait de Lara" 
+              className="w-full h-full object-cover object-top"
             />
           </div>
           
