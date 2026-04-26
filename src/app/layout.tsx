@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import { Inter, Cormorant_Garamond } from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from 'sonner';
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans", weight: ["300","400","500","600"] });
-const cormorant = Cormorant_Garamond({ 
+const dmSans = DM_Sans({ 
   subsets: ["latin"], 
-  variable: "--font-serif",
-  weight: ["300","400","500","600","700"],
+  variable: "--font-sans",
+  weight: ["300","400","500","600","700","800","900"],
   style: ["normal","italic"]
 });
 
@@ -23,9 +22,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="h-full scroll-smooth">
-      <body className={`${inter.variable} ${cormorant.variable} font-sans min-h-full flex flex-col`}>
+      <body className={`${dmSans.variable} font-sans min-h-full flex flex-col bg-[#0D0D0D]`}>
         {children}
-        <Toaster position="bottom-right" theme="light" richColors />
+        <Toaster position="bottom-right" theme="dark" richColors />
       </body>
     </html>
   );

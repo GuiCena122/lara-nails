@@ -15,7 +15,7 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: "La Maison", href: "#philosophy" },
+    { name: "Studio", href: "#philosophy" },
     { name: "Services", href: "#services" },
     { name: "Galerie", href: "#gallery" },
     { name: "Contact", href: "#contact" },
@@ -24,57 +24,56 @@ export default function Navbar() {
   return (
     <>
       <motion.header
-        initial={{ y: -80, opacity: 0 }}
+        initial={{ y: -60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 w-full z-50 transition-all duration-700 ${
-          scrolled
-            ? "bg-[#2C1A0E]/95 backdrop-blur-md py-4 shadow-xl shadow-black/20"
-            : "bg-transparent py-7"
+        transition={{ duration: 1, ease: "easeOut" }}
+        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+          scrolled ? "bg-[#0D0D0D]/90 backdrop-blur-xl border-b border-white/5 py-4" : "bg-transparent py-6"
         }`}
       >
-        <div className="max-w-[1400px] mx-auto px-8 md:px-16 flex items-center justify-between">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 flex items-center justify-between">
+
           {/* Logo */}
-          <Link href="/" className="relative z-50 flex items-center gap-3">
-            <div className="w-[1px] h-8 bg-[#C9A05C] opacity-60" />
-            <span className="font-serif text-2xl tracking-[0.12em] text-[#F5EFE6] italic font-light">
-              Lara Nails
+          <Link href="/" className="flex items-center gap-3 group z-50 relative">
+            <div className="w-8 h-8 rounded-full bg-[#e76f51] flex items-center justify-center text-white text-sm font-black group-hover:scale-110 transition-transform duration-300">
+              L
+            </div>
+            <span className="text-white text-lg font-bold tracking-tight">
+              Lara <span className="text-[#e76f51]">Nails</span>
             </span>
-            <div className="w-[1px] h-8 bg-[#C9A05C] opacity-60" />
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-10">
+          <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-[11px] uppercase tracking-[0.22em] font-medium text-[#F5EFE6]/70 hover:text-[#C9A05C] transition-colors duration-500"
+                className="text-white/50 hover:text-white text-sm font-medium transition-colors duration-300 relative group"
               >
                 {link.name}
+                <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#e76f51] group-hover:w-full transition-all duration-400 rounded-full" />
               </Link>
             ))}
           </nav>
 
           {/* CTA */}
-          <div className="hidden md:flex">
-            <Link
-              href="/admin"
-              className="text-[11px] uppercase tracking-[0.2em] font-semibold text-[#2C1A0E] bg-[#C9A05C] px-6 py-3 hover:bg-[#F5EFE6] transition-colors duration-500"
-            >
-              Espace Privé
-            </Link>
-          </div>
+          <Link
+            href="/admin"
+            className="hidden md:inline-flex items-center gap-2 bg-[#e76f51] hover:bg-[#f4a261] text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-colors duration-300"
+          >
+            Espace Pro
+          </Link>
 
           {/* Mobile Toggle */}
           <button
-            className="md:hidden relative z-50 flex flex-col justify-center items-center w-8 h-8 gap-[6px]"
+            className="md:hidden z-50 relative flex flex-col justify-center items-center w-8 h-8 gap-[5px]"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Menu"
           >
-            <span className={`w-6 h-[1px] bg-[#C9A05C] transition-all duration-500 ${mobileMenuOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
-            <span className={`w-6 h-[1px] bg-[#C9A05C] transition-all duration-500 ${mobileMenuOpen ? "opacity-0" : ""}`} />
-            <span className={`w-6 h-[1px] bg-[#C9A05C] transition-all duration-500 ${mobileMenuOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
+            <span className={`w-6 h-[2px] bg-white rounded-full transition-all duration-400 ${mobileMenuOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
+            <span className={`w-6 h-[2px] bg-white rounded-full transition-all duration-400 ${mobileMenuOpen ? "opacity-0 w-0" : ""}`} />
+            <span className={`w-6 h-[2px] bg-white rounded-full transition-all duration-400 ${mobileMenuOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
           </button>
         </div>
       </motion.header>
@@ -82,43 +81,35 @@ export default function Navbar() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, clipPath: "inset(0 0 100% 0)" }}
-            animate={{ opacity: 1, clipPath: "inset(0 0 0% 0)" }}
-            exit={{ opacity: 0, clipPath: "inset(0 0 100% 0)" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-40 bg-[#2C1A0E] flex flex-col items-center justify-center gap-10"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="fixed inset-0 z-40 bg-[#0D0D0D] flex flex-col items-center justify-center gap-8"
           >
-            {/* Gold top line */}
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C9A05C] to-transparent" />
-
             {navLinks.map((link, i) => (
               <motion.div
                 key={link.name}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + i * 0.07, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ delay: i * 0.07, duration: 0.5 }}
               >
                 <Link
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-3xl font-serif italic font-light text-[#F5EFE6] hover:text-[#C9A05C] transition-colors duration-500"
+                  className="text-4xl font-bold text-white hover:text-[#e76f51] transition-colors duration-300"
                 >
                   {link.name}
                 </Link>
               </motion.div>
             ))}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className="mt-8"
-            >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
               <Link
                 href="/admin"
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-xs uppercase tracking-[0.25em] font-semibold text-[#2C1A0E] bg-[#C9A05C] px-8 py-4"
+                className="mt-4 bg-[#e76f51] text-white text-sm font-bold px-8 py-4 rounded-full"
               >
-                Espace Privé
+                Espace Pro
               </Link>
             </motion.div>
           </motion.div>
