@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-sans);
-  --font-serif: var(--font-serif);
-  
-  --color-primary: #d4a373;
-  --color-rose-50: #fff5f6;
-  --color-rose-100: #ffe8eb;
-  --color-rose-400: #f4a261;
-  --color-rose-500: #e76f51;
-  --color-nude-50: #fefae0;
+  --font-sans: "Inter", var(--font-sans);
+  --font-serif: "Playfair Display", var(--font-serif);
+
+  --color-brand-black: #0B0B0B;
+  --color-brand-gold: #C9A66B;
+  --color-brand-ivory: #F7F3EE;
+  --color-brand-powder: #E8CFC7;
+
+  --shadow-luxury: 0 10px 30px -10px rgba(201, 166, 107, 0.2);
 }
 
 :root {
-  --background: #fff5f6;
-  --foreground: #2d2d2d;
+  --background: #0B0B0B;
+  --foreground: #F7F3EE;
 }
 
 @layer base {
@@ -26,26 +26,22 @@
   }
 
   ::selection {
-    background-color: #ffe8eb;
-    color: #e76f51;
+    background-color: #C9A66B;
+    color: #0B0B0B;
   }
 }
 
 @layer components {
-  .glass {
-    @apply bg-white/60 backdrop-blur-xl border border-white/40 shadow-[0_4px_24px_rgba(255,193,201,0.1)];
+  .glass-luxury {
+    @apply bg-brand-black/60 backdrop-blur-xl border border-white/10 shadow-luxury;
   }
 
-  .glass-dark {
-    @apply bg-[#251f1f]/80 backdrop-blur-xl border border-white/5;
+  .gold-gradient {
+    @apply bg-gradient-to-br from-brand-gold to-[#EAD0A8];
   }
-  
-  .glass-light {
-    @apply bg-white/40 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(231,111,81,0.1)];
-  }
-  
-  .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-[#e76f51] to-[#f4a261];
+
+  .gold-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-brand-gold to-[#EAD0A8];
   }
 }
 

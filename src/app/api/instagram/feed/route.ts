@@ -1,19 +1,23 @@
 import { NextResponse } from 'next/server';
 
 /**
- * Endpoint de stub para o feed do Instagram.
- * Quando a integração for ativada, este endpoint deve:
- * 1. Buscar o token de acesso do banco de dados (tabela instagram_tokens).
- * 2. Chamar a Instagram Graph API (me/media).
- * 3. Cachear os resultados por 1 hora.
+ * INSTAGRAM FEED STUB
+ * Ativação futura:
+ * 1. Obter Access Token em Meta for Developers.
+ * 2. Substituir retorno pelo fetch da API: https://graph.instagram.com/me/media
+ * 3. Escopos necessários: user_profile, user_media.
  */
 export async function GET() {
   return NextResponse.json(
     {
-      status: "pending",
-      message: "Integração com Instagram não está ativa. Consulte src/lib/instagram/README.md para instruções de ativação.",
-      mock_data: []
+      status: "placeholder",
+      message: "Integração Instagram pendente. Consulte STYLE_GUIDE.md.",
+      data: [
+        { id: "1", media_url: "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=600", permalink: "#" },
+        { id: "2", media_url: "https://images.unsplash.com/photo-1519014816548-bf5fe059e98b?q=80&w=600", permalink: "#" },
+        { id: "3", media_url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=600", permalink: "#" }
+      ]
     },
-    { status: 501 }
+    { status: 501 } // Not Implemented explicitly
   );
 }

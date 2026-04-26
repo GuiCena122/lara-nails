@@ -1,0 +1,27 @@
+:root {
+  /* Brand Colors */
+  --color-black: #0B0B0B;
+  --color-gold: #C9A66B;
+  --color-ivory: #F7F3EE;
+  --color-powder: #E8CFC7;
+
+  /* Typography */
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Shadows */
+  --shadow-luxury: 0 10px 30px -10px rgba(201, 166, 107, 0.2);
+
+  /* Transitions */
+  --transition-subtle: 180ms ease-in-out;
+}
+
+.luxury-gradient {
+  background: linear-gradient(135deg, var(--color-black) 0%, #1A1A1A 100%);
+}
+
+.gold-text-gradient {
+  background: linear-gradient(to right, #C9A66B, #EAD0A8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
