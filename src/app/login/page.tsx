@@ -6,6 +6,8 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { Lock, Mail, Loader2, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Typography } from "@/components/ui/Typography";
+import { Button } from "@/components/ui/Button";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -25,10 +27,10 @@ export default function LoginPage() {
 
       if (error) throw error;
 
-      toast.success("Bienvenue, Lara !");
+      toast.success("Bienvenue dans votre espace, Lara.");
       router.push("/admin");
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Erreur lors de la connexion";
+      const message = error instanceof Error ? error.message : "Identifiants invalides";
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -36,77 +38,90 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0D0D0D] flex items-center justify-center p-6 selection:bg-[#e76f51]">
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#e76f51]/10 rounded-full blur-[120px] pointer-events-none" />
+    <main className="min-h-screen bg-brand-black flex items-center justify-center p-6 selection:bg-brand-gold selection:text-brand-black relative overflow-hidden">
+      {/* Background Decorative Elements */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-brand-gold/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-brand-powder/5 rounded-full blur-[100px]" />
+      </div>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md relative"
+        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-lg relative z-10"
       >
-        <div className="text-center mb-10">
+        {/* Logo Section */}
+        <div className="text-center mb-12">
           <motion.div
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            className="w-16 h-16 rounded-2xl bg-[#e76f51] flex items-center justify-center text-white text-3xl font-black mx-auto mb-6 shadow-lg shadow-[#e76f51]/20"
+            initial={{ scale: 0.8, rotate: -5 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ duration: 0.8 }}
+            className="w-20 h-20 rounded-[2rem] border border-brand-gold/20 flex items-center justify-center text-brand-gold text-4xl font-black mx-auto mb-8 shadow-2xl bg-white/[0.02]"
           >
             L
           </motion.div>
-          <h1 className="text-3xl font-serif font-bold text-white mb-2">Accès Studio</h1>
-          <p className="text-white/40 text-sm font-light uppercase tracking-widest">Administration Lara Nails</p>
+          <Typography variant="h2" serif className="text-brand-ivory mb-3 tracking-tighter">Accès Privé</Typography>
+          <Typography variant="label" className="text-brand-gold">Administration Lara Nails</Typography>
         </div>
 
-        <div className="glass-dark border border-white/10 rounded-[2.5rem] p-8 md:p-10">
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-2">E-mail</label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+        {/* Login Form */}
+        <div className="glass-luxury border border-white/5 rounded-[4rem] p-10 md:p-14 shadow-[0_0_100px_rgba(0,0,0,0.5)]">
+          <form onSubmit={handleLogin} className="space-y-8">
+            <div className="space-y-3">
+              <Typography variant="label" className="px-2">Identifiant (E-mail)</Typography>
+              <div className="relative group">
+                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-gold/40 group-focus-within:text-brand-gold transition-colors" />
                 <input
                   required
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="lara@nails.fr"
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-white text-sm outline-none focus:border-[#e76f51] transition-all"
+                  placeholder="votre@email.fr"
+                  className="w-full bg-white/[0.03] border border-white/5 rounded-[2rem] pl-14 pr-6 py-5 text-brand-ivory text-sm outline-none focus:border-brand-gold/40 focus:bg-white/[0.05] transition-all"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-2">Mot de passe</label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <div className="space-y-3">
+              <Typography variant="label" className="px-2">Mot de passe</Typography>
+              <div className="relative group">
+                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-gold/40 group-focus-within:text-brand-gold transition-colors" />
                 <input
                   required
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-white text-sm outline-none focus:border-[#e76f51] transition-all"
+                  className="w-full bg-white/[0.03] border border-white/5 rounded-[2rem] pl-14 pr-6 py-5 text-brand-ivory text-sm outline-none focus:border-brand-gold/40 focus:bg-white/[0.05] transition-all"
                 />
               </div>
             </div>
 
-            <button
-              disabled={isLoading}
-              type="submit"
-              className="w-full bg-[#e76f51] hover:bg-[#f4a261] text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#e76f51]/10"
-            >
-              {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <>
-                  Se connecter <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </>
-              )}
-            </button>
+            <div className="pt-4">
+              <Button
+                disabled={isLoading}
+                type="submit"
+                variant="luxury"
+                size="lg"
+                className="w-full py-7 group shadow-2xl shadow-brand-gold/10"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    SE CONNECTER <ArrowRight className="ml-3 w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                  </>
+                )}
+              </Button>
+            </div>
           </form>
         </div>
 
-        <p className="text-center mt-8 text-white/20 text-[10px] font-medium uppercase tracking-[0.2em]">
-          L&apos;excellence, toujours.
-        </p>
+        {/* Footer text */}
+        <div className="text-center mt-12 opacity-20">
+           <Typography variant="label" className="text-[8px]">Propulsé par Lara Nails Pro — Paris</Typography>
+        </div>
       </motion.div>
     </main>
   );

@@ -25,19 +25,22 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-brand-black/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-brand-black/90 backdrop-blur-md"
           />
 
           {/* Content */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.9, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            exit={{ opacity: 0, scale: 0.9, y: 30 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              "relative w-full max-w-lg glass-luxury p-8 md:p-10 rounded-[3rem] border border-white/10 shadow-2xl",
+              "relative w-full max-w-lg glass-luxury p-10 md:p-12 rounded-[4rem] border border-brand-gold/20 shadow-[0_0_80px_rgba(0,0,0,0.6)] overflow-hidden",
               className
             )}
           >
+            {/* Decorative Inner Glow */}
+            <div className="absolute -top-24 -left-24 w-64 h-64 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
             <div className="flex items-center justify-between mb-8">
               {title && (
                 <Typography variant="h3" serif className="text-brand-ivory">{title}</Typography>

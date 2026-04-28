@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Upload as UploadIcon, X } from "lucide-react";
 import { Typography } from "./Typography";
+import { motion } from "framer-motion";
 
 export function Upload() {
   const [preview, setPreview] = React.useState<string | null>(null);
@@ -18,28 +19,34 @@ export function Upload() {
 
   return (
     <div className="w-full">
-      <label className="relative group flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-brand-gold/20 rounded-[2.5rem] bg-white/5 hover:bg-brand-gold/5 transition-all cursor-pointer overflow-hidden">
+      <label className="relative group flex flex-col items-center justify-center w-full h-72 border-2 border-dashed border-brand-gold/20 rounded-[3.5rem] bg-white/[0.02] hover:bg-brand-gold/[0.03] hover:border-brand-gold/40 transition-all duration-700 cursor-pointer overflow-hidden group">
         {preview ? (
-          <div className="absolute inset-0 w-full h-full">
+          <motion.div
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="absolute inset-0 w-full h-full"
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={preview} alt="Preview" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-brand-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <Typography variant="span" className="text-white font-bold">Changer l&apos;image</Typography>
+            <img src={preview} alt="Preview" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+            <div className="absolute inset-0 bg-brand-black/40 backdrop-blur-[2px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <div className="bg-brand-gold text-brand-black px-6 py-2 rounded-full font-bold text-xs tracking-widest shadow-xl">
+                CHANGER L&apos;IMAGE
+              </div>
             </div>
             <button
               onClick={(e) => { e.preventDefault(); setPreview(null); }}
-              className="absolute top-4 right-4 p-2 bg-brand-black/60 rounded-full text-white hover:bg-brand-gold transition-colors"
+              className="absolute top-6 right-6 p-2.5 bg-brand-black/60 rounded-full text-white hover:bg-brand-gold hover:text-brand-black transition-all shadow-lg z-20"
             >
-              <X size={16} />
+              <X size={18} />
             </button>
-          </div>
+          </motion.div>
         ) : (
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            <div className="w-16 h-16 rounded-2xl bg-brand-gold/10 flex items-center justify-center text-brand-gold mb-4 group-hover:scale-110 transition-transform">
-              <UploadIcon size={28} />
+            <div className="w-20 h-20 rounded-3xl bg-brand-gold/5 border border-brand-gold/10 flex items-center justify-center text-brand-gold mb-6 group-hover:scale-110 group-hover:bg-brand-gold group-hover:text-brand-black transition-all duration-500 shadow-lg">
+              <UploadIcon size={32} />
             </div>
-            <Typography variant="span" className="text-brand-ivory mb-2">Ajouter un chef-d&apos;œuvre</Typography>
-            <Typography variant="label" className="text-[8px]">PNG, JPG ou WebP (max. 5MB)</Typography>
+            <Typography variant="h4" serif className="text-brand-ivory mb-2 tracking-tight">Ajouter un chef-d&apos;œuvre</Typography>
+            <Typography variant="label" className="text-[9px] text-brand-gold/40">PNG, JPG OU WEBP (MAX. 5MB)</Typography>
           </div>
         )}
         <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />

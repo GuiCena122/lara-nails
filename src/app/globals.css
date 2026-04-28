@@ -9,7 +9,7 @@
   --color-brand-ivory: #F7F3EE;
   --color-brand-powder: #E8CFC7;
 
-  --shadow-luxury: 0 10px 30px -10px rgba(201, 166, 107, 0.2);
+  --shadow-luxury: 0 20px 50px -12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(201, 166, 107, 0.1);
 }
 
 :root {
@@ -23,25 +23,41 @@
     color: var(--foreground);
     @apply antialiased;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-attachment: fixed;
+    background-blend-mode: overlay;
+    opacity: 0.98;
   }
 
-  ::selection {
-    background-color: #C9A66B;
-    color: #0B0B0B;
+  /* Custom Premium Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0B0B0B;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #C9A66B;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #EAD0A8;
   }
 }
 
 @layer components {
   .glass-luxury {
-    @apply bg-brand-black/60 backdrop-blur-xl border border-white/10 shadow-luxury;
+    @apply bg-brand-black/40 backdrop-blur-2xl border border-white/10 shadow-luxury;
   }
 
   .gold-gradient {
-    @apply bg-gradient-to-br from-brand-gold to-[#EAD0A8];
+    @apply bg-gradient-to-br from-[#C9A66B] via-[#EAD0A8] to-[#C9A66B];
+    background-size: 200% 200%;
   }
 
   .gold-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-brand-gold to-[#EAD0A8];
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-brand-gold via-[#F7F3EE] to-brand-gold;
+    background-size: 200% auto;
   }
 }
 

@@ -12,12 +12,18 @@ import {
   Sparkles,
   Trash2,
   Plus,
-  X
+  X,
+  ArrowRight,
+  ShieldCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Service } from "@/lib/types";
+import { Typography } from "@/components/ui/Typography";
+import { Button } from "@/components/ui/Button";
+
+export const dynamic = 'force-dynamic';
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("salon");
@@ -41,7 +47,8 @@ export default function SettingsPage() {
   }, [supabase]);
 
   useEffect(() => {
-    fetchServices();
+    const timer = setTimeout(() => fetchServices(), 0);
+    return () => clearTimeout(timer);
   }, [fetchServices]);
 
   const handleAddService = async (e: React.FormEvent) => {
@@ -63,7 +70,7 @@ export default function SettingsPage() {
     } else {
       if (data) setServices([...services, data[0] as Service]);
       setIsServiceModalOpen(false);
-      toast.success("Prestation ajoutée !");
+      toast.success("Prestation ajoutée au catalogue.");
     }
   };
 
@@ -77,140 +84,224 @@ export default function SettingsPage() {
       toast.error("Erreur lors de la suppression");
     } else {
       setServices(services.filter(s => s.id !== id));
-      toast.success("Prestation supprimée");
+      toast.success("Prestation supprimée.");
     }
   };
 
   const handleSave = () => {
     toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-      loading: 'Enregistrement...',
-      success: 'Modifications enregistrées !',
-      error: 'Erreur',
+      loading: 'Enregistrement des modifications...',
+      success: 'Configurations mises à jour avec succès.',
+      error: 'Une erreur est survenue.',
     });
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="space-y-12 animate-in fade-in duration-1000">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-white/[0.02] border border-white/5 p-8 rounded-[3rem]">
         <div>
-          <h2 className="text-2xl font-serif font-bold">Paramètres</h2>
-          <p className="text-gray-500 text-sm font-light">Gérez votre studio.</p>
+          <Typography variant="h3" serif className="text-brand-ivory mb-1 text-balance">Paramètres du Studio</Typography>
+          <Typography variant="p" className="text-xs text-brand-ivory/40 italic font-light tracking-wide">Configurez votre identité et vos services premium.</Typography>
         </div>
-        <button onClick={handleSave} className="bg-[#e76f51] text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg shadow-[#e76f51]/20 flex items-center gap-2 hover:scale-[1.02] transition-all">
-          <Save className="w-4 h-4" /> Enregistrer
-        </button>
+        <Button variant="luxury" size="default" onClick={handleSave} className="group shadow-xl">
+           <Save className="w-4 h-4 mr-2" /> SAUVEGARDER
+        </Button>
       </div>
 
-      <div className="grid lg:grid-cols-4 gap-8">
-        <div className="lg:col-span-1 glass-dark p-4 rounded-3xl border border-white/5 h-fit">
-          <nav className="space-y-1">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
-                  activeTab === tab.id
-                    ? "bg-[#e76f51]/20 text-[#e76f51] border border-[#e76f51]/30"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
-                )}
-              >
-                <tab.icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            ))}
-          </nav>
+      <div className="grid lg:grid-cols-12 gap-12">
+        {/* Navigation Sidebar */}
+        <div className="lg:col-span-3">
+          <div className="glass-luxury p-5 rounded-[2.5rem] border border-white/5 sticky top-32">
+            <nav className="space-y-2">
+              {tabs.map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={cn(
+                      "w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-500 group relative overflow-hidden",
+                      isActive
+                        ? "bg-brand-gold text-brand-black shadow-brand-gold/20 shadow-lg"
+                        : "text-brand-ivory/40 hover:text-brand-ivory hover:bg-white/[0.03]"
+                    )}
+                  >
+                    <tab.icon size={18} className={cn("transition-transform duration-500", isActive ? "scale-110" : "group-hover:scale-110")} />
+                    <Typography variant="span" className="text-[10px] font-black uppercase tracking-[0.2em]">
+                      {tab.label}
+                    </Typography>
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
         </div>
 
-        <div className="lg:col-span-3 space-y-8">
+        {/* Content Area */}
+        <div className="lg:col-span-9 space-y-12">
           {activeTab === "salon" && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-              <div className="glass-dark p-8 rounded-[2rem] border border-white/5">
-                <div className="flex items-center gap-6 mb-8 pb-8 border-b border-white/5">
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
+              <div className="glass-luxury p-10 md:p-14 rounded-[4rem] border border-white/5 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
+
+                <div className="flex items-center gap-8 mb-12 pb-12 border-b border-white/5 relative z-10">
                   <div className="relative group">
-                    <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-[#e76f51] to-[#a67c2e] flex items-center justify-center text-3xl font-bold border-4 border-white/5">L</div>
-                    <label className="absolute -bottom-2 -right-2 p-2 bg-white text-black rounded-xl shadow-xl cursor-pointer hover:scale-110 transition-all">
-                      <Camera className="w-4 h-4" />
+                    <div className="w-28 h-28 rounded-3xl bg-brand-black border border-brand-gold/20 flex items-center justify-center text-4xl font-black text-brand-gold shadow-2xl relative overflow-hidden">
+                       <div className="absolute inset-0 bg-gradient-to-br from-brand-gold/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                       L
+                    </div>
+                    <label className="absolute -bottom-2 -right-2 p-3 bg-brand-gold text-brand-black rounded-2xl shadow-xl cursor-pointer hover:scale-110 transition-all border-4 border-brand-black">
+                      <Camera size={18} />
                       <input type="file" className="hidden" accept="image/*" />
                     </label>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-1">Lara Nails Studio</h3>
-                    <p className="text-sm text-gray-500">Logo e branding</p>
+                    <Typography variant="h3" serif className="text-brand-ivory mb-1">Lara Nails Studio</Typography>
+                    <Typography variant="label" className="text-brand-gold">IDENTITÉ VISUELLE</Typography>
                   </div>
                 </div>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-2">Nom du Studio</label>
-                    <input type="text" defaultValue="Lara Nails" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-[#e76f51] transition-all" />
+
+                <div className="grid md:grid-cols-2 gap-10 relative z-10">
+                  <div className="space-y-3">
+                    <Typography variant="label" className="px-2">Nom de l&apos;Établissement</Typography>
+                    <input type="text" defaultValue="Lara Nails Paris" className="w-full bg-white/[0.03] border border-white/5 rounded-2xl p-5 text-sm text-brand-ivory outline-none focus:border-brand-gold/30 transition-all" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-2">Téléphone</label>
-                    <input type="text" defaultValue="+33 6 12 34 56 78" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-[#e76f51] transition-all" />
+                  <div className="space-y-3">
+                    <Typography variant="label" className="px-2">Téléphone Professionnel</Typography>
+                    <input type="text" defaultValue="+33 6 12 34 56 78" className="w-full bg-white/[0.03] border border-white/5 rounded-2xl p-5 text-sm text-brand-ivory outline-none focus:border-brand-gold/30 transition-all" />
+                  </div>
+                  <div className="md:col-span-2 space-y-3">
+                    <Typography variant="label" className="px-2">Adresse du Studio</Typography>
+                    <input type="text" defaultValue="12 Avenue de l'Élégance, 75008 Paris" className="w-full bg-white/[0.03] border border-white/5 rounded-2xl p-5 text-sm text-brand-ivory outline-none focus:border-brand-gold/30 transition-all" />
                   </div>
                 </div>
+              </div>
+
+              <div className="glass-luxury p-10 md:p-14 rounded-[4rem] border border-white/5">
+                 <div className="flex items-center gap-4 mb-10">
+                    <div className="w-12 h-12 rounded-2xl bg-brand-gold/5 border border-brand-gold/10 flex items-center justify-center text-brand-gold"><Clock size={20} /></div>
+                    <Typography variant="h3" serif className="text-brand-ivory">Horaires d&apos;Ouverture</Typography>
+                 </div>
+
+                 <div className="space-y-4">
+                   {["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"].map((day) => (
+                     <div key={day} className="flex items-center justify-between p-5 bg-white/[0.02] border border-white/5 rounded-[2rem] group hover:border-brand-gold/20 transition-all">
+                       <Typography variant="span" className="text-xs font-bold">{day.toUpperCase()}</Typography>
+                       <div className="flex items-center gap-6">
+                         {day === "Dimanche" ? (
+                           <Typography variant="label" className="text-rose-400/60 font-black">FERMÉ</Typography>
+                         ) : (
+                           <div className="flex items-center gap-3">
+                             <input type="text" defaultValue="09:00" className="w-16 bg-transparent border-b border-white/10 text-center text-[11px] font-black text-brand-gold focus:border-brand-gold outline-none pb-1" />
+                             <span className="text-white/10">—</span>
+                             <input type="text" defaultValue="19:00" className="w-16 bg-transparent border-b border-white/10 text-center text-[11px] font-black text-brand-gold focus:border-brand-gold outline-none pb-1" />
+                           </div>
+                         )}
+                         <label className="relative inline-flex items-center cursor-pointer">
+                           <input type="checkbox" defaultChecked={day !== "Dimanche"} className="sr-only peer" />
+                           <div className="w-12 h-6 bg-white/5 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:bg-brand-gold after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white/10 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-gold/10 border border-white/5"></div>
+                         </label>
+                       </div>
+                     </div>
+                   ))}
+                 </div>
               </div>
             </motion.div>
           )}
 
           {activeTab === "services" && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-              <div className="flex items-center justify-between">
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-10">
+              <div className="flex items-center justify-between px-4">
                 <div>
-                  <h3 className="text-xl font-bold">Catalogue</h3>
-                  <p className="text-sm text-gray-500">Gérez vos prestations</p>
+                  <Typography variant="h3" serif className="text-brand-ivory mb-1">Catalogue de Soins</Typography>
+                  <Typography variant="label" className="text-brand-gold">GESTION DES PRESTATIONS</Typography>
                 </div>
-                <button onClick={() => setIsServiceModalOpen(true)} className="bg-[#e76f51] text-white px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2 shadow-lg shadow-[#e76f51]/20">
-                  <Plus className="w-4 h-4" /> Ajouter
-                </button>
+                <Button variant="luxury" size="sm" onClick={() => setIsServiceModalOpen(true)} className="px-8 shadow-xl">
+                  <Plus size={14} className="mr-2" /> AJOUTER
+                </Button>
               </div>
-              <div className="grid gap-4">
+              <div className="grid md:grid-cols-2 gap-6">
                 {services.map((service) => (
-                  <div key={service.id} className="glass-dark p-6 rounded-[1.5rem] border border-white/5 flex items-center justify-between group hover:border-[#e76f51]/30 transition-all">
-                    <div className="flex items-center gap-5">
-                      <div className="w-14 h-14 rounded-2xl bg-[#e76f51]/10 flex items-center justify-center text-[#e76f51]"><Sparkles className="w-7 h-7" /></div>
+                  <motion.div
+                    key={service.id}
+                    layoutId={service.id}
+                    className="glass-luxury p-8 rounded-[2.5rem] border border-white/5 flex items-center justify-between group hover:border-brand-gold/30 transition-all duration-500 overflow-hidden relative"
+                  >
+                    <div className="flex items-center gap-6 relative z-10">
+                      <div className="w-14 h-14 rounded-2xl bg-brand-gold/5 border border-brand-gold/10 flex items-center justify-center text-brand-gold group-hover:bg-brand-gold group-hover:text-brand-black transition-all duration-500 shadow-lg">
+                        <Sparkles size={24} />
+                      </div>
                       <div>
-                        <h4 className="font-bold text-lg">{service.name}</h4>
+                        <Typography variant="h4" serif className="text-lg group-hover:text-brand-gold transition-colors duration-500">{service.name}</Typography>
                         <div className="flex items-center gap-4 mt-1">
-                          <span className="text-xs text-gray-500 flex items-center gap-1.5"><Clock className="w-3 h-3" /> {service.duration_minutes} min</span>
-                          <span className="text-xs font-black text-[#e76f51] bg-[#e76f51]/10 px-2 py-0.5 rounded-full uppercase">{service.price} €</span>
+                          <Typography variant="label" className="text-[7px] flex items-center gap-1.5 opacity-30"><Clock size={10} /> {service.duration_minutes} MIN</Typography>
+                          <Typography variant="label" className="text-[7px] font-black text-brand-gold">{service.price} €</Typography>
                         </div>
                       </div>
                     </div>
-                    <button onClick={() => handleDeleteService(service.id)} className="p-3 text-gray-500 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-all"><Trash2 className="w-5 h-5" /></button>
-                  </div>
+                    <button onClick={() => handleDeleteService(service.id)} className="p-3 text-brand-ivory/10 hover:text-rose-400 hover:bg-rose-400/5 rounded-xl transition-all relative z-10">
+                      <Trash2 size={16} />
+                    </button>
+                    <div className="absolute inset-0 bg-gradient-to-br from-brand-gold/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </motion.div>
                 ))}
               </div>
             </motion.div>
           )}
+
+          {activeTab === "security" && (
+             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8 text-balance">
+                <div className="glass-luxury p-10 md:p-14 rounded-[4rem] border border-white/5 text-center">
+                   <div className="w-20 h-20 rounded-3xl bg-brand-gold/5 border border-brand-gold/10 flex items-center justify-center mx-auto mb-8 text-brand-gold shadow-xl">
+                      <ShieldCheck size={32} />
+                   </div>
+                   <Typography variant="h3" serif className="text-brand-ivory mb-3">Sécurité du Compte</Typography>
+                   <Typography variant="p" className="text-sm text-brand-ivory/40 max-w-sm mx-auto italic mb-10 text-balance">
+                      Gérez vos accès et la protection de vos données confidentielles.
+                   </Typography>
+                   <div className="flex justify-center gap-4">
+                      <Button variant="outline">CHANGER LE MOT DE PASSE</Button>
+                      <Button variant="outline">DOUBLE AUTHENTIFICATION</Button>
+                   </div>
+                </div>
+             </motion.div>
+          )}
         </div>
       </div>
 
+      {/* New Service Modal */}
       <AnimatePresence>
         {isServiceModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsServiceModalOpen(false)} />
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-md glass-dark border border-white/10 rounded-3xl p-8" >
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-xl font-bold">Nouvelle Prestation</h3>
-                <button onClick={() => setIsServiceModalOpen(false)} className="p-2 bg-white/5 rounded-full"><X className="w-4 h-4" /></button>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-brand-black/90 backdrop-blur-md" onClick={() => setIsServiceModalOpen(false)} />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 30 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="relative w-full max-w-md glass-luxury border border-brand-gold/20 rounded-[4rem] p-10 md:p-14 shadow-2xl overflow-hidden text-balance" >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-bl-full pointer-events-none" />
+              <div className="flex items-center justify-between mb-12 relative z-10">
+                <div>
+                  <Typography variant="h3" serif className="text-brand-ivory mb-1 text-balance">Nouveau Soin</Typography>
+                  <Typography variant="label" className="text-brand-gold text-balance">CATALOGUE PREMIUM</Typography>
+                </div>
+                <button onClick={() => setIsServiceModalOpen(false)} className="p-3 bg-white/5 rounded-full hover:bg-white/10 transition-colors text-brand-gold"><X size={20} /></button>
               </div>
-              <form onSubmit={handleAddService} className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Nom</label>
-                  <input required name="name" type="text" className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm outline-none focus:border-[#e76f51]" />
+              <form onSubmit={handleAddService} className="space-y-8 relative z-10">
+                <div className="space-y-3">
+                  <Typography variant="label" className="px-2 text-balance">Nom de la prestation</Typography>
+                  <input required name="name" type="text" placeholder="Ex: Manucure Spa" className="w-full bg-white/[0.03] border border-white/10 rounded-[1.5rem] p-5 text-sm outline-none focus:border-brand-gold/40 focus:bg-white/[0.05] transition-all text-brand-ivory" />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Prix (€)</label>
-                    <input required name="price" type="number" className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm outline-none focus:border-[#e76f51]" />
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <Typography variant="label" className="px-2 text-balance">Prix (€)</Typography>
+                    <input required name="price" type="number" placeholder="0.00" className="w-full bg-white/[0.03] border border-white/10 rounded-[1.5rem] p-5 text-sm outline-none focus:border-brand-gold/40 focus:bg-white/[0.05] transition-all text-brand-ivory" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Durée (min)</label>
-                    <input required name="duration" type="number" defaultValue="60" className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm outline-none focus:border-[#e76f51]" />
+                  <div className="space-y-3">
+                    <Typography variant="label" className="px-2 text-balance">Durée (min)</Typography>
+                    <input required name="duration" type="number" defaultValue="60" className="w-full bg-white/[0.03] border border-white/10 rounded-[1.5rem] p-5 text-sm outline-none focus:border-brand-gold/40 focus:bg-white/[0.05] transition-all text-brand-ivory" />
                   </div>
                 </div>
-                <button type="submit" className="w-full py-4 mt-4 bg-[#e76f51] text-white rounded-xl font-bold">Ajouter</button>
+                <Button type="submit" variant="luxury" size="lg" className="w-full py-7 group">
+                   AJOUTER AU CATALOGUE <ArrowRight size={14} className="ml-3 group-hover:translate-x-1 transition-transform" />
+                </Button>
               </form>
             </motion.div>
           </div>
