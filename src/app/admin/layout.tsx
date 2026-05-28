@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import {
   LayoutDashboard, MessageSquare, Calendar, Users, Settings,
-  LogOut, Bell,
+  LogOut, Bell, Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
@@ -16,6 +16,7 @@ const menuItems = [
   { id: 'inbox', label: 'Instagram Inbox', icon: MessageSquare, href: '/admin/inbox' },
   { id: 'calendar', label: 'Calendrier', icon: Calendar, href: '/admin/calendar' },
   { id: 'clients', label: 'Clientes', icon: Users, href: '/admin/clients' },
+  { id: 'services', label: 'Services', icon: Sparkles, href: '/admin/services' },
   { id: 'settings', label: 'Paramètres', icon: Settings, href: '/admin/settings' },
 ]
 
