@@ -25,14 +25,14 @@ export default function InboxPage() {
   const [selectedContact] = useState(contacts[0]);
 
   return (
-    <div className="relative h-[calc(100vh-160px)] flex gap-12 animate-in fade-in duration-1000 pb-10 text-balance bg-brand-ivory min-h-screen">
+    <div className="relative min-h-[calc(100vh-120px)] md:h-[calc(100vh-160px)] flex gap-12 animate-in fade-in duration-1000 pb-10 bg-brand-ivory">
       {/* Overlay - The Silk Curtain (Instagram Integration) - Light Mode */}
       <div className="absolute inset-0 z-50 flex items-center justify-center p-8 bg-white/40 backdrop-blur-xl rounded-[4rem] border border-black/5 shadow-luxury">
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 1.2, ease: [0.43, 0.13, 0.23, 0.96] }}
-          className="max-w-xl text-center bg-white/90 border-[0.5px] border-brand-gold/30 p-16 md:p-24 rounded-[5rem] shadow-luxury relative overflow-hidden"
+          className="max-w-xl text-center bg-white/90 border-[0.5px] border-brand-gold/30 p-8 sm:p-16 md:p-24 rounded-[3rem] md:rounded-[5rem] shadow-luxury relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-bl-full pointer-events-none" />
 

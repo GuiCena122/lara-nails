@@ -122,7 +122,7 @@ export default function AdminLayout({
       {/* Main Content - Light Mode */}
       <main className="flex-1 flex flex-col md:ml-72 pb-28 md:pb-0 relative">
         {/* Header */}
-        <header className="h-24 border-b border-black/5 flex items-center justify-between px-8 md:px-16 sticky top-0 bg-white/80 backdrop-blur-2xl z-30">
+        <header className="h-16 md:h-24 border-b border-black/5 flex items-center justify-between px-4 md:px-16 sticky top-0 bg-white/80 backdrop-blur-2xl z-30">
           <div className="flex flex-col">
             <Typography variant="label" className="text-[7px] mb-1 font-black opacity-30 uppercase tracking-widest">NAVIGATION</Typography>
             <Typography variant="h3" serif className="text-brand-black text-2xl">
@@ -149,13 +149,13 @@ export default function AdminLayout({
           </div>
         </header>
 
-        <div className="flex-1 overflow-x-hidden p-8 md:p-16 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <div className="flex-1 overflow-x-hidden p-4 md:p-16 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           {children}
         </div>
       </main>
 
       {/* Mobile Bottom Navigation - Light Mode */}
-      <nav className="md:hidden fixed bottom-8 left-8 right-8 bg-white/90 backdrop-blur-2xl border border-black/5 rounded-[3rem] z-50 shadow-luxury p-3">
+      <nav className="md:hidden fixed bottom-3 left-3 right-3 bg-white/95 backdrop-blur-2xl border border-black/5 rounded-[2.5rem] z-50 shadow-luxury p-2">
         <div className="flex items-center justify-around">
           {menuItems.map((item) => {
             const isActive = activeTab === item.id;

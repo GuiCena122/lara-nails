@@ -78,13 +78,13 @@ export default function AdminDashboard() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-16 animate-in fade-in duration-1000 pb-20 text-balance bg-brand-ivory min-h-screen"
+      className="space-y-8 md:space-y-16 animate-in fade-in duration-1000 pb-20 bg-brand-ivory min-h-screen"
     >
       {/* Planner Header - Light Mode */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b-[0.5px] border-black/10 pb-12">
         <div>
           <Typography variant="label" className="text-brand-gold mb-4 block tracking-[0.4em] font-black uppercase">PLANNER ÉDITORIAL</Typography>
-          <Typography variant="h1" serif className="text-6xl lg:text-8xl tracking-tighter text-brand-black text-balance">Vue <br /> <span className="gold-text-shine italic text-balance">d&apos;ensemble.</span></Typography>
+          <Typography variant="h1" serif className="text-4xl sm:text-6xl lg:text-8xl tracking-tighter text-brand-black text-balance">Vue <br /> <span className="gold-text-shine italic text-balance">d&apos;ensemble.</span></Typography>
         </div>
         <div className="flex flex-col items-start md:items-end">
            <Typography variant="h3" serif className="text-black/10 mb-2 font-black uppercase">2026</Typography>
@@ -152,7 +152,7 @@ export default function AdminDashboard() {
 
         {/* Sidebar: Planner Metadata (Light) */}
         <motion.div variants={itemVariants} className="lg:col-span-4 space-y-12">
-           <div className="p-10 bg-white border-[0.5px] border-brand-gold/20 rounded-[3rem] shadow-sm text-balance">
+           <div className="p-6 md:p-10 bg-white border-[0.5px] border-brand-gold/20 rounded-[2rem] md:rounded-[3rem] shadow-sm">
               <Typography variant="h4" serif className="mb-8 text-2xl text-brand-black">Notes de la Session</Typography>
               <Typography variant="p" className="text-xs italic leading-relaxed text-brand-black/40 mb-10 text-balance">
                  &quot;Le détail n&apos;est pas un détail, c&apos;est le produit lui-même.&quot; — Focus sur la qualité des cuticules pour la série de demain.
@@ -164,7 +164,7 @@ export default function AdminDashboard() {
               </Link>
            </div>
 
-           <div className="p-10 border-[0.5px] border-black/5 rounded-[3rem] bg-white shadow-sm text-balance">
+           <div className="p-6 md:p-10 border-[0.5px] border-black/5 rounded-[2rem] md:rounded-[3rem] bg-white shadow-sm">
               <Typography variant="label" className="text-brand-gold mb-6 block font-black uppercase">OBJECTIF SEMAINE</Typography>
               <div className="space-y-4">
                  <div className="flex justify-between items-center text-balance">

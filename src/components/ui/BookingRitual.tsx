@@ -53,8 +53,8 @@ export function BookingRitual() {
   return (
     <div className="w-full max-w-6xl mx-auto text-balance">
       {/* Stepper Progress - The Silk Thread (Gold on Ivory) */}
-      <div className="flex justify-between mb-24 px-12 relative">
-        <div className="absolute top-1 left-12 right-12 h-[0.5px] bg-black/5 -translate-y-1/2 z-0" />
+      <div className="flex justify-between mb-16 md:mb-24 px-0 md:px-12 relative">
+        <div className="absolute top-1 left-0 right-0 md:left-12 md:right-12 h-[0.5px] bg-black/5 -translate-y-1/2 z-0" />
         {steps.map((s, i) => (
           <div key={s.id} className="flex flex-col items-center gap-6 relative z-10">
             <motion.div
@@ -78,7 +78,7 @@ export function BookingRitual() {
         ))}
       </div>
 
-      <div className="bg-white/80 backdrop-blur-2xl rounded-[6rem] border-[0.5px] border-brand-gold/20 min-h-[750px] flex flex-col relative overflow-hidden shadow-luxury">
+      <div className="bg-white/80 backdrop-blur-2xl rounded-[2rem] md:rounded-[6rem] border-[0.5px] border-brand-gold/20 min-h-[500px] md:min-h-[750px] flex flex-col relative overflow-hidden shadow-luxury">
         <AnimatePresence mode="wait">
           {step === 0 && (
             <motion.div
@@ -91,7 +91,7 @@ export function BookingRitual() {
             >
               <div className="mb-20">
                  <Typography variant="label" className="text-brand-gold mb-6 block tracking-[0.5em] uppercase font-black">ACTE I : LA DÉCOUVERTE</Typography>
-                 <Typography variant="h1" serif className="text-6xl md:text-8xl lg:text-[7rem] leading-[0.85] tracking-tighter text-brand-black">L&apos;Éveil de <br /> <span className="gold-text-shine italic">vos sens.</span></Typography>
+                 <Typography variant="h1" serif className="text-4xl sm:text-6xl md:text-8xl lg:text-[7rem] leading-[0.85] tracking-tighter text-brand-black">L&apos;Éveil de <br /> <span className="gold-text-shine italic">vos sens.</span></Typography>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -99,7 +99,7 @@ export function BookingRitual() {
                   <button
                     key={s.id}
                     onClick={() => { setSelectedService(s); nextStep(); }}
-                    className="group relative aspect-[3/4] rounded-[5rem] border-[0.5px] border-black/5 bg-brand-ivory overflow-hidden transition-all duration-1000 hover:border-brand-gold/40 shadow-sm hover:shadow-xl"
+                    className="group relative aspect-[3/4] rounded-[3rem] md:rounded-[5rem] border-[0.5px] border-black/5 bg-brand-ivory overflow-hidden transition-all duration-1000 hover:border-brand-gold/40 shadow-sm hover:shadow-xl"
                   >
                     <div className="absolute inset-0 z-0">
                        <LuxuryImage

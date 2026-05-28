@@ -120,13 +120,13 @@ export default function CalendarPage() {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-16 animate-in fade-in duration-1000 pb-20 text-balance bg-brand-ivory min-h-screen"
+      className="space-y-8 md:space-y-16 animate-in fade-in duration-1000 pb-20 bg-brand-ivory min-h-screen"
     >
       {/* Planner Header - Light Mode */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b-[0.5px] border-black/10 pb-12">
         <div>
           <Typography variant="label" className="text-brand-gold mb-4 block tracking-[0.4em] font-black uppercase">AGENDA ÉDITORIAL</Typography>
-          <Typography variant="h1" serif className="text-6xl lg:text-8xl tracking-tighter text-brand-black text-balance">Le <br /> <span className="gold-text-shine italic">Planner.</span></Typography>
+          <Typography variant="h1" serif className="text-4xl sm:text-6xl lg:text-8xl tracking-tighter text-brand-black text-balance">Le <br /> <span className="gold-text-shine italic">Planner.</span></Typography>
         </div>
         <div className="flex flex-col items-start md:items-end gap-6 text-balance">
            <div className="text-right text-balance">
@@ -240,7 +240,7 @@ export default function CalendarPage() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 30 }}
               transition={{ duration: 0.8, ease: [0.43, 0.13, 0.23, 0.96] }}
-              className="relative w-full max-w-xl bg-white border border-brand-gold/20 rounded-[4rem] p-12 md:p-16 shadow-luxury overflow-hidden text-balance"
+              className="relative w-full max-w-xl bg-white border border-brand-gold/20 rounded-[2.5rem] md:rounded-[4rem] p-6 md:p-16 shadow-luxury overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-bl-full pointer-events-none text-balance" />
 

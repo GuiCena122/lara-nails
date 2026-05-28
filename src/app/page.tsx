@@ -71,9 +71,9 @@ export default function Home() {
       <Hero />
 
       {/* ── SECTION: PHILOSOPHY ─────────────────────────── */}
-      <section id="philosophy" className="py-40 relative overflow-hidden">
+      <section id="philosophy" className="py-20 md:py-40 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 text-balance">
-          <div className="grid lg:grid-cols-2 gap-24 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
 
             {/* Visual side - The Stone (No Borders) */}
             <motion.div
@@ -83,7 +83,7 @@ export default function Home() {
               transition={{ duration: 1, ease: [0.43, 0.13, 0.23, 0.96] }}
               className="relative"
             >
-              <div className="relative aspect-[4/5] rounded-t-[15rem] rounded-b-[3rem] overflow-hidden shadow-2xl group">
+              <div className="relative aspect-[4/5] rounded-t-[6rem] md:rounded-t-[15rem] rounded-b-[2rem] md:rounded-b-[3rem] overflow-hidden shadow-2xl group">
                 <LuxuryImage
                   src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=900&auto=format&fit=crop"
                   alt="Ambiance studio"
@@ -152,7 +152,7 @@ export default function Home() {
       </section>
 
       {/* ── SECTION: SERVICES ─────────────────────────── */}
-      <section id="services" className="py-40 bg-white relative overflow-hidden text-balance">
+      <section id="services" className="py-20 md:py-40 bg-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-gold/5 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 text-balance">
@@ -164,7 +164,7 @@ export default function Home() {
               className="text-balance"
             >
               <Typography variant="label" className="text-brand-gold mb-6 block uppercase tracking-widest font-black">Prestations</Typography>
-              <Typography variant="h1" serif className="leading-none text-6xl md:text-8xl tracking-tighter text-brand-black text-balance">Nos Soins <br /> <span className="gold-text-shine italic">Signature.</span></Typography>
+              <Typography variant="h1" serif className="leading-none text-4xl sm:text-6xl md:text-8xl tracking-tighter text-brand-black text-balance">Nos Soins <br /> <span className="gold-text-shine italic">Signature.</span></Typography>
             </motion.div>
             <Typography variant="p" className="max-w-xs text-black/40 text-sm italic font-light text-balance leading-relaxed">
               Une seleção rigorosa de cuidados adaptada às suas necessidades específicas de beleza.
@@ -180,7 +180,7 @@ export default function Home() {
       </section>
 
       {/* ── SECTION: GALERIE ─────────────────────────────── */}
-      <section id="gallery" className="py-32 bg-brand-ivory">
+      <section id="gallery" className="py-20 md:py-32 bg-brand-ivory">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -192,7 +192,7 @@ export default function Home() {
             <Typography variant="h2" serif className="text-5xl md:text-6xl tracking-tighter text-brand-black">Notre <span className="gold-text-shine italic">Univers.</span></Typography>
           </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
             {galleryImages.map((src, i) => (
               <motion.div
                 key={i}
@@ -200,7 +200,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.7, delay: i * 0.08 }}
-                className={`overflow-hidden rounded-[3rem] group relative shadow-sm hover:shadow-2xl transition-all duration-1000 ${i === 0 || i === 5 ? "md:row-span-2" : ""}`}
+                className={`overflow-hidden rounded-[2rem] md:rounded-[3rem] group relative shadow-sm hover:shadow-2xl transition-all duration-1000 ${i === 0 || i === 5 ? "md:row-span-2" : ""}`}
               >
                 <LuxuryImage
                   src={src}
@@ -216,7 +216,7 @@ export default function Home() {
       </section>
 
       {/* ── SECTION: RITUAL (BOOKING) ─────────────────────────── */}
-      <section id="contact" className="py-60 relative bg-white">
+      <section id="contact" className="py-20 md:py-60 relative bg-white">
         <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
           <div className="text-center mb-24">
              <motion.div
@@ -260,8 +260,8 @@ export default function Home() {
       </section>
 
       {/* Footer - Light Luxury */}
-      <footer className="py-32 border-t border-black/5 bg-brand-ivory relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 text-balance text-balance text-balance text-balance">
+      <footer className="py-20 md:py-32 border-t border-black/5 bg-brand-ivory relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8 items-start mb-24">
             <div className="md:col-span-5 space-y-8 text-balance">
               <div className="flex items-center gap-4">

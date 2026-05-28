@@ -134,7 +134,7 @@ export default function ClientsPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b-[0.5px] border-black/10 pb-12">
         <div>
           <Typography variant="label" className="text-brand-gold mb-4 block tracking-[0.4em] font-black uppercase">REGISTRE DES CLIENTES</Typography>
-          <Typography variant="h1" serif className="text-6xl lg:text-8xl tracking-tighter text-brand-black">Le Livre <br /> <span className="gold-text-shine italic">d&apos;Or.</span></Typography>
+          <Typography variant="h1" serif className="text-4xl sm:text-6xl lg:text-8xl tracking-tighter text-brand-black">Le Livre <br /> <span className="gold-text-shine italic">d&apos;Or.</span></Typography>
         </div>
         <div className="flex items-center gap-6">
            <button onClick={() => toast.info("Statistiques bientôt disponíveis")} className="text-black/20 hover:text-brand-gold transition-colors p-4">
@@ -158,7 +158,7 @@ export default function ClientsPage() {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full bg-transparent border-b-[0.5px] border-black/10 py-5 pl-10 pr-6 text-xl font-serif italic text-brand-black outline-none focus:border-brand-gold transition-all placeholder:text-black/10"
+            className="w-full bg-transparent border-b-[0.5px] border-black/10 py-4 md:py-5 pl-8 md:pl-10 pr-4 md:pr-6 text-base md:text-xl font-serif italic text-brand-black outline-none focus:border-brand-gold transition-all placeholder:text-black/10"
           />
         </div>
         <button onClick={() => toast.info("Filtres em breve")} className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-black/30 hover:text-brand-black transition-all">
@@ -167,18 +167,18 @@ export default function ClientsPage() {
       </div>
 
       {/* The Gold Ledger (Table) - Light Mode */}
-      <div className="bg-white rounded-[4rem] border border-black/5 overflow-hidden shadow-sm relative">
+      <div className="bg-white rounded-[2rem] md:rounded-[4rem] border border-black/5 overflow-hidden shadow-sm relative">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[0.5px] bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent" />
 
         <div className="overflow-x-auto text-balance">
           <table className="w-full text-left">
             <thead>
               <tr className="bg-brand-ivory/30 border-b border-black/5">
-                <th className="px-10 py-8 text-[9px] font-black uppercase tracking-[0.4em] text-brand-gold/60">PRÉFÉRENCES & IDENTITÉ</th>
-                <th className="px-10 py-8 text-[9px] font-black uppercase tracking-[0.4em] text-brand-gold/60 text-center">STATUT</th>
-                <th className="px-10 py-8 text-[9px] font-black uppercase tracking-[0.4em] text-brand-gold/60 text-center hidden md:table-cell">SÉANCES</th>
-                <th className="px-10 py-8 text-[9px] font-black uppercase tracking-[0.4em] text-brand-gold/60 text-right hidden md:table-cell">VALEUR ÉLÉVATION</th>
-                <th className="px-10 py-8 text-right text-[9px] font-black uppercase tracking-[0.4em] text-brand-gold/60">ACTIONS</th>
+                <th className="px-4 md:px-10 py-4 md:py-8 text-[9px] font-black uppercase tracking-[0.4em] text-brand-gold/60">PRÉFÉRENCES & IDENTITÉ</th>
+                <th className="px-4 md:px-10 py-4 md:py-8 text-[9px] font-black uppercase tracking-[0.4em] text-brand-gold/60 text-center">STATUT</th>
+                <th className="px-4 md:px-10 py-4 md:py-8 text-[9px] font-black uppercase tracking-[0.4em] text-brand-gold/60 text-center hidden md:table-cell">SÉANCES</th>
+                <th className="px-4 md:px-10 py-4 md:py-8 text-[9px] font-black uppercase tracking-[0.4em] text-brand-gold/60 text-right hidden md:table-cell">VALEUR ÉLÉVATION</th>
+                <th className="px-4 md:px-10 py-4 md:py-8 text-right text-[9px] font-black uppercase tracking-[0.4em] text-brand-gold/60">ACTIONS</th>
               </tr>
             </thead>
             <motion.tbody
@@ -193,7 +193,7 @@ export default function ClientsPage() {
                   variants={rowVariants}
                   className="hover:bg-brand-ivory/50 transition-colors group cursor-default"
                 >
-                  <td className="px-10 py-10">
+                  <td className="px-4 md:px-10 py-4 md:py-10">
                     <div className="flex items-center gap-8">
                       <div className="w-14 h-14 rounded-full border border-brand-gold/20 flex items-center justify-center font-black text-brand-gold bg-white shadow-sm relative overflow-hidden group-hover:border-brand-gold transition-all duration-700">
                          <div className="absolute inset-0 bg-gradient-to-br from-brand-gold/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -205,7 +205,7 @@ export default function ClientsPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-10 py-10 text-center">
+                  <td className="px-4 md:px-10 py-4 md:py-10 text-center">
                     <span className={cn(
                       "text-[8px] font-black px-4 py-1 rounded-full uppercase tracking-[0.2em] border shadow-sm",
                       client.status === "Vip" ? "bg-brand-gold text-white border-brand-gold" : "border-black/10 text-black/40"
@@ -213,13 +213,13 @@ export default function ClientsPage() {
                       {client.status}
                     </span>
                   </td>
-                  <td className="px-10 py-10 text-center hidden md:table-cell">
+                  <td className="px-4 md:px-10 py-4 md:py-10 text-center hidden md:table-cell">
                     <Typography variant="span" className="text-lg font-serif italic text-black/60">{client.visits}</Typography>
                   </td>
-                  <td className="px-10 py-10 text-right hidden md:table-cell">
+                  <td className="px-4 md:px-10 py-4 md:py-10 text-right hidden md:table-cell">
                     <Typography variant="h3" serif className="text-brand-gold text-2xl group-hover:scale-110 transition-transform duration-500">{client.spent}</Typography>
                   </td>
-                  <td className="px-10 py-10 text-right">
+                  <td className="px-4 md:px-10 py-4 md:py-10 text-right">
                     <div className="flex justify-end gap-6">
                       <button className="text-black/10 hover:text-brand-gold transition-all" title="Historique">
                         <History size={20} strokeWidth={1.5} />

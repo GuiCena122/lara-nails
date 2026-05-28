@@ -25,7 +25,7 @@ export function ServiceCard({ title, price, duration, description, image, macro,
       viewport={{ once: true }}
       transition={{ duration: 1, ease: [0.43, 0.13, 0.23, 0.96] }}
       className={cn(
-        "group relative bg-white/40 backdrop-blur-2xl p-10 md:p-12 rounded-[3.5rem] transition-all duration-700 hover:-translate-y-4 border-[0.5px] border-brand-gold/10 hover:border-brand-gold/30 overflow-hidden shadow-luxury",
+        "group relative bg-white/40 backdrop-blur-2xl p-6 sm:p-10 md:p-12 rounded-[2rem] md:rounded-[3.5rem] transition-all duration-700 hover:-translate-y-4 border-[0.5px] border-brand-gold/10 hover:border-brand-gold/30 overflow-hidden shadow-luxury",
         className
       )}
     >

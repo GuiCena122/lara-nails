@@ -78,7 +78,7 @@ export default function Navbar() {
 
             {/* Left: Links */}
             <div className="flex-1 flex flex-col justify-center px-8 lg:px-24 pt-32 lg:pt-0 relative z-10">
-              <div className="space-y-6 lg:space-y-10">
+              <div className="space-y-4 sm:space-y-6 lg:space-y-10">
                 {menuLinks.map((link, i) => (
                   <motion.div
                     key={link.label}
@@ -99,7 +99,7 @@ export default function Navbar() {
                       <Typography
                         variant="h1"
                         serif
-                        className="text-4xl md:text-6xl lg:text-8xl text-brand-black hover:text-brand-gold transition-colors duration-500 leading-none tracking-tighter"
+                        className="text-3xl sm:text-5xl lg:text-8xl text-brand-black hover:text-brand-gold transition-colors duration-500 leading-none tracking-tighter"
                       >
                         {link.label}
                       </Typography>

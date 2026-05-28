@@ -98,11 +98,11 @@ export default function SettingsPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b-[0.5px] border-black/10 pb-12">
         <div>
           <Typography variant="label" className="text-brand-gold mb-4 block tracking-[0.4em] font-black uppercase text-balance">CONFIGURATIONS PLANNER</Typography>
-          <Typography variant="h1" serif className="text-6xl lg:text-8xl tracking-tighter text-brand-black text-balance">Votre <br /> <span className="gold-text-shine italic text-balance">Identité.</span></Typography>
+          <Typography variant="h1" serif className="text-4xl sm:text-6xl lg:text-8xl tracking-tighter text-brand-black text-balance">Votre <br /> <span className="gold-text-shine italic text-balance">Identité.</span></Typography>
         </div>
         <div className="flex flex-col items-start md:items-end gap-6 text-balance">
            <Typography variant="label" className="text-[10px] font-black tracking-[0.5em] text-brand-gold uppercase">RÉGLAGES DE PRÉCISION</Typography>
-           <Button variant="luxury" size="default" className="h-14 px-12 border-[0.5px] border-brand-gold/20 group text-white" onClick={() => toast.info("Sauvegarde automatique active")}>
+           <Button variant="luxury" size="default" className="h-14 px-8 md:px-12 border-[0.5px] border-brand-gold/20 group text-white whitespace-nowrap" onClick={() => toast.info("Sauvegarde automatique active")}>
               <Save className="w-4 h-4 mr-3" /> <span className="tracking-[0.2em]">SCELLER</span>
            </Button>
         </div>

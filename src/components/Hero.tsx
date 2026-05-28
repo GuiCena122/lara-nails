@@ -23,7 +23,7 @@ const title = "L'Art de Sublimer Vos Mains.";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center pt-24 overflow-hidden bg-brand-ivory text-brand-black">
+    <section className="relative min-h-[90svh] flex items-center pt-16 md:pt-24 overflow-hidden bg-brand-ivory text-brand-black">
       {/* Dynamic Background Elements - Solar Luxury */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-brand-gold/5 rounded-full blur-[160px]" />
@@ -45,7 +45,7 @@ export default function Hero() {
             </Typography>
           </motion.div>
 
-          <h1 className="relative flex flex-wrap font-serif text-6xl md:text-8xl lg:text-[9vw] leading-[0.85] tracking-tighter text-brand-black mb-14 text-balance">
+          <h1 className="relative flex flex-wrap font-serif text-5xl sm:text-6xl md:text-8xl lg:text-[9vw] leading-[0.85] tracking-tighter text-brand-black mb-8 md:mb-14 text-balance">
             {title.split(" ").map((word, wordIndex) => (
               <span key={wordIndex} className="mr-[0.3em] overflow-hidden flex pb-[0.1em]">
                 {word.split("").map((char, charIndex) => (
@@ -91,6 +91,25 @@ export default function Hero() {
                      VOIR LES SOINS
                   </Typography>
                </Link>
+            </div>
+          </motion.div>
+
+          {/* Mobile Portrait — visible only on small screens */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.5, delay: 0.8, ease: 'easeOut' }}
+            className="lg:hidden mt-12 w-full"
+          >
+            <div className="relative aspect-[3/4] max-h-[60svh] rounded-[3rem] overflow-hidden shadow-2xl mx-auto max-w-sm">
+              <Image
+                src="/lara-portrait.png"
+                alt="Lara Nails"
+                fill
+                className="object-cover object-top"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-ivory/40 via-transparent to-transparent" />
             </div>
           </motion.div>
         </div>
