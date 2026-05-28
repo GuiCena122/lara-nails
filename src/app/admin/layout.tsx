@@ -24,6 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter()
   const supabase = createClient()
   const [sessionChecked, setSessionChecked] = useState(false)
+  const [todayCount, setTodayCount] = useState(0)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -34,6 +35,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       }
     })
   }, [router, supabase])
+
+  useEffect(() => {
+    if (!sessionChecked) return
+    const today = new Date().toISOString().split('T')[0]
+    supabase.from('appointments').select('id', { count: 'exact' }).eq('appointment_date', today).then(({ count }) => {
+      if (count) setTodayCount(count)
+    })
+  }, [sessionChecked, supabase])
 
   const activeTab = menuItems.find(item => {
     if (item.href === '/admin') return pathname === '/admin'
@@ -102,13 +111,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {menuItems.find(i => i.id === activeTab)?.label}
           </h2>
           <div className="flex items-center gap-3 md:gap-6">
-            <button
-              onClick={() => toast.info('Aucune nouvelle notification')}
+            <Link
+              href="/admin/calendar"
               className="relative p-2 text-gray-400 hover:text-white transition-all"
+              title={`${todayCount} rendez-vous aujourd'hui`}
             >
               <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-[#e76f51] rounded-full" />
-            </button>
+              {todayCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-[#e76f51] text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                  {todayCount}
+                </span>
+              )}
+            </Link>
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
                 <p className="text-xs font-bold">Lara Nails</p>

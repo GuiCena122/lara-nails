@@ -16,6 +16,9 @@ export default function ClientsPage() {
   const [modal, setModal] = useState(false)
   const [page, setPage] = useState(1)
   const [menu, setMenu] = useState<string | null>(null)
+  const [histClient, setHistClient] = useState<ClientEntry | null>(null)
+  const [histAppts, setHistAppts] = useState<any[]>([])
+  const [histLoading, setHistLoading] = useState(false)
   const perPage = 8
   const supabase = createClient()
 
@@ -63,6 +66,17 @@ export default function ClientsPage() {
     const { error: de } = await q
     if (de) { toast.error(de.message); return }
     toast.success('Cliente supprimée.'); fetchClients()
+  }
+
+  const openHistory = async (c: ClientEntry) => {
+    setMenu(null); setHistClient(c); setHistLoading(true)
+    let q = supabase.from('appointments').select('*').order('appointment_date', { ascending: false })
+    if (c.email) q = q.eq('client_email', c.email)
+    else if (c.phone) q = q.eq('client_phone', c.phone)
+    else q = q.eq('client_name', c.name)
+    const { data } = await q
+    setHistAppts(data || [])
+    setHistLoading(false)
   }
 
   const sClass = (s: string) => s === 'Vip' ? 'bg-[#e76f51]/20 text-[#e76f51]' : s === 'Régulier' ? 'bg-blue-500/10 text-blue-400' : 'bg-green-500/10 text-green-400'
@@ -127,7 +141,7 @@ export default function ClientsPage() {
                         <button onClick={() => setMenu(menu === c.id ? null : c.id)} className="p-2 text-gray-500 hover:text-white hover:bg-white/5 rounded-lg"><MoreHorizontal className="w-4 h-4" /></button>
                         {menu === c.id && (
                           <div className="absolute right-0 top-10 bg-[#1a1a1a] border border-white/10 rounded-xl p-1 shadow-xl z-20 min-w-[130px]">
-                            <button onClick={() => { setMenu(null); toast.info('Historique bientôt disponible') }} className="w-full flex items-center gap-2 px-3 py-2 text-xs text-gray-300 hover:bg-white/5 rounded-lg"><History className="w-3.5 h-3.5" /> Historique</button>
+                            <button onClick={() => openHistory(c)} className="w-full flex items-center gap-2 px-3 py-2 text-xs text-gray-300 hover:bg-white/5 rounded-lg"><History className="w-3.5 h-3.5" /> Historique</button>
                             <button onClick={() => handleDelete(c)} className="w-full flex items-center gap-2 px-3 py-2 text-xs text-rose-400 hover:bg-rose-400/10 rounded-lg"><Trash2 className="w-3.5 h-3.5" /> Supprimer</button>
                           </div>
                         )}
@@ -167,6 +181,44 @@ export default function ClientsPage() {
                 <div className="space-y-2"><label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Téléphone</label><input name="phone" className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]" /></div>
                 <button type="submit" className="w-full py-4 bg-[#e76f51] text-white rounded-xl font-bold hover:scale-[1.02] transition-transform">Enregistrer</button>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* History Modal */}
+      <AnimatePresence>
+        {histClient && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { setHistClient(null); setHistAppts([]) }} />
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-lg glass-dark border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl max-h-[80vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-xl font-serif font-bold">{histClient.name}</h3>
+                  <p className="text-xs text-gray-500 mt-1">{histClient.visits} visite{histClient.visits > 1 ? 's' : ''} · {histClient.spent}€</p>
+                </div>
+                <button onClick={() => { setHistClient(null); setHistAppts([]) }} className="p-2 bg-white/5 rounded-full hover:bg-white/10"><X className="w-4 h-4" /></button>
+              </div>
+              {histLoading ? (
+                <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-gray-500" /></div>
+              ) : histAppts.length === 0 ? (
+                <p className="text-center py-12 text-gray-500 text-sm">Aucun rendez-vous trouvé.</p>
+              ) : (
+                <div className="space-y-3">
+                  {histAppts.map((a: any) => (
+                    <div key={a.id} className="bg-white/5 rounded-xl p-4 flex justify-between items-start">
+                      <div>
+                        <p className="font-bold text-sm">{a.service_name}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{a.appointment_date} · {a.appointment_time?.slice(0, 5)}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-[#e76f51] text-sm">{a.price} €</p>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${a.status === 'confirmed' ? 'bg-green-500/20 text-green-400' : a.status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-rose-500/20 text-rose-400'}`}>{a.status === 'confirmed' ? 'Confirmé' : a.status === 'pending' ? 'En attente' : 'Annulé'}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           </div>
         )}

@@ -72,6 +72,7 @@ export default function SettingsPage() {
   const [sched, setSched] = useState<DayS[]>(DEFAULT)
   const [saving, setSaving] = useState(false)
   const [adminEmail, setAdminEmail] = useState('')
+  const [logoPreview, setLogoPreview] = useState<string | null>(null)
 
   useEffect(() => {
     const saved = localStorage.getItem('lara-settings')
@@ -123,8 +124,8 @@ export default function SettingsPage() {
               <div className="glass-dark p-6 rounded-2xl border border-white/5">
                 <div className="flex items-center gap-5 mb-6 pb-6 border-b border-white/5">
                   <div className="relative">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#e76f51] to-[#a67c2e] flex items-center justify-center text-2xl font-bold border-2 border-white/5">L</div>
-                    <label className="absolute -bottom-1 -right-1 p-1.5 bg-white text-black rounded-lg shadow cursor-pointer hover:scale-110"><Camera className="w-3.5 h-3.5" /><input type="file" className="hidden" accept="image/*" /></label>
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#e76f51] to-[#a67c2e] flex items-center justify-center text-2xl font-bold border-2 border-white/5 overflow-hidden">{logoPreview ? <img src={logoPreview} alt="Logo" className="w-full h-full object-cover" /> : 'L'}</div>
+                    <label className="absolute -bottom-1 -right-1 p-1.5 bg-white text-black rounded-lg shadow cursor-pointer hover:scale-110"><Camera className="w-3.5 h-3.5" /><input type="file" className="hidden" accept="image/*" onChange={e => { const f = e.target.files?.[0]; if (f) { const r = new FileReader(); r.onload = () => setLogoPreview(r.result as string); r.readAsDataURL(f) } }} /></label>
                   </div>
                   <div><h3 className="font-bold">Lara Nails Studio</h3><p className="text-xs text-gray-500">Logo & branding</p></div>
                 </div>
