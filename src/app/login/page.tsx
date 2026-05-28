@@ -28,7 +28,7 @@ export default function LoginPage() {
       if (error) throw error;
 
       toast.success("Bienvenue dans votre espace, Lara.");
-      router.push("/admin");
+      window.location.href = "/admin";
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Identifiants invalides";
       toast.error(message);
