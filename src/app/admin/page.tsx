@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
-  Users, Calendar, DollarSign, Wallet,
+  Users, Calendar, DollarSign, Wallet, TrendingUp,
   CalendarPlus, BellRing, FileDown,
   Loader2, AlertTriangle, RefreshCw,
 } from 'lucide-react'
@@ -49,11 +49,17 @@ export default function AdminDashboard() {
     .filter(a => a.payment_type === 'fiado' || a.payment_type === 'parcelado')
     .reduce((acc, a) => acc + Number(a.price || 0), 0)
 
+  const today = new Date().toISOString().split('T')[0]
+  const futureEarnings = appointments
+    .filter(a => a.appointment_date >= today && a.status !== 'cancelled')
+    .reduce((acc, a) => acc + Number(a.price || 0), 0)
+
   const stats = [
     { label: "Chiffre d'Affaires", value: `${totalRevenue} €`, icon: DollarSign },
     { label: 'Clientes', value: totalClients.toString(), icon: Users },
     { label: 'Rendez-vous', value: confirmedCount.toString(), icon: Calendar },
     { label: 'À recevoir', value: `${pendingPayments} €`, icon: Wallet },
+    { label: 'Prévisionnel', value: `${futureEarnings} €`, icon: TrendingUp },
   ]
 
   const recent = appointments.slice(0, 5)
@@ -74,8 +80,8 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="space-y-8 animate-in fade-in">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
+          {[...Array(5)].map((_, i) => (
             <div key={i} className="glass-dark p-6 rounded-2xl border border-white/5 animate-pulse">
               <div className="h-4 w-20 bg-white/5 rounded mb-4" />
               <div className="h-8 w-24 bg-white/5 rounded mb-1" />
@@ -89,7 +95,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8 animate-in fade-in">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
         {stats.map((stat, i) => (
           <motion.div
             key={i}
