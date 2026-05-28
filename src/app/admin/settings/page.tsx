@@ -1,74 +1,114 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { 
-  User, 
-  Store, 
-  Bell, 
-  Lock, 
-  CreditCard, 
-  Globe, 
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import {
+  User,
+  Store,
+  Bell,
+  Lock,
+  CreditCard,
   Camera,
   Save,
-  Clock
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+  Clock,
+  Check,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
+
+type DaySchedule = { day: string; open: string; close: string; active: boolean }
+
+const DEFAULT_SCHEDULE: DaySchedule[] = [
+  { day: 'Lundi', open: '09:00', close: '19:00', active: true },
+  { day: 'Mardi', open: '09:00', close: '19:00', active: true },
+  { day: 'Mercredi', open: '09:00', close: '19:00', active: true },
+  { day: 'Jeudi', open: '09:00', close: '19:00', active: true },
+  { day: 'Vendredi', open: '09:00', close: '19:00', active: true },
+  { day: 'Samedi', open: '10:00', close: '17:00', active: true },
+  { day: 'Dimanche', open: '—', close: '—', active: false },
+]
+
+const tabs = [
+  { id: 'salon', label: 'Studio', icon: Store },
+  { id: 'profile', label: 'Profil', icon: User },
+  { id: 'notifications', label: 'Notifications', icon: Bell },
+  { id: 'security', label: 'Sécurité', icon: Lock },
+  { id: 'billing', label: 'Paiements', icon: CreditCard },
+]
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState("salon");
-
-  const tabs = [
-    { id: "salon", label: "Studio", icon: Store },
-    { id: "profile", label: "Profil", icon: User },
-    { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "security", label: "Sécurité", icon: Lock },
-    { id: "billing", label: "Paiements", icon: CreditCard },
-  ];
+  const [activeTab, setActiveTab] = useState('salon')
+  const [studioName, setStudioName] = useState('Lara Nails')
+  const [studioPhone, setStudioPhone] = useState('+33 6 12 34 56 78')
+  const [studioAddress, setStudioAddress] = useState("12 Avenue de l'Élégance, Paris")
+  const [schedule, setSchedule] = useState<DaySchedule[]>(DEFAULT_SCHEDULE)
+  const [saving, setSaving] = useState(false)
 
   const handleSave = () => {
-    toast.promise(
-      new Promise((resolve) => setTimeout(resolve, 1000)),
-      {
-        loading: 'Enregistrement en cours...',
-        success: 'Modifications enregistrées avec succès !',
-        error: 'Erreur lors de la sauvegarde',
-      }
-    );
-  };
+    setSaving(true)
+    // Persiste no localStorage como MVP (substituir por Supabase quando tabela existir)
+    const settings = { studioName, studioPhone, studioAddress, schedule }
+    localStorage.setItem('lara-nails-settings', JSON.stringify(settings))
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      toast.success("Logo mis à jour !");
-    }
-  };
+    setTimeout(() => {
+      setSaving(false)
+      toast.success('Modifications enregistrées avec succès !')
+    }, 600)
+  }
+
+  const toggleDay = (idx: number) => {
+    setSchedule(prev =>
+      prev.map((d, i) => (i === idx ? { ...d, active: !d.active } : d))
+    )
+  }
+
+  const updateScheduleTime = (idx: number, field: 'open' | 'close', value: string) => {
+    setSchedule(prev =>
+      prev.map((d, i) => (i === idx ? { ...d, [field]: value } : d))
+    )
+  }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in">
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h2 className="text-2xl font-serif font-bold">Paramètres</h2>
-          <p className="text-gray-500 text-sm font-light">Gérez les configurations de votre studio et de votre compte.</p>
+          <p className="text-gray-500 text-sm font-light">
+            Gérez les configurations de votre studio et de votre compte.
+          </p>
         </div>
-        <button onClick={handleSave} className="bg-[#e76f51] text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg shadow-[#e76f51]/20 flex items-center gap-2 hover:scale-[1.02] transition-all">
-          <Save className="w-4 h-4" /> Enregistrer les modifications
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-[#e76f51] text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg shadow-[#e76f51]/20 flex items-center gap-2 hover:scale-[1.02] transition-all disabled:opacity-50"
+        >
+          {saving ? (
+            <>
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Enregistrement...
+            </>
+          ) : (
+            <>
+              <Save className="w-4 h-4" /> Enregistrer les modifications
+            </>
+          )}
         </button>
       </div>
 
       <div className="grid lg:grid-cols-4 gap-8">
-        {/* Settings Navigation */}
+        {/* Tabs */}
         <div className="lg:col-span-1 glass-dark p-4 rounded-3xl border border-white/5 h-fit">
           <nav className="space-y-1">
-            {tabs.map((tab) => (
+            {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
-                  activeTab === tab.id 
-                    ? "bg-[#e76f51]/20 text-[#e76f51] border border-[#e76f51]/30" 
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                  'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all',
+                  activeTab === tab.id
+                    ? 'bg-[#e76f51]/20 text-[#e76f51] border border-[#e76f51]/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
                 )}
               >
                 <tab.icon className="w-4 h-4" />
@@ -78,24 +118,29 @@ export default function SettingsPage() {
           </nav>
         </div>
 
-        {/* Settings Content */}
+        {/* Content */}
         <div className="lg:col-span-3 space-y-8">
-          {activeTab === "salon" && (
+          {/* ── Studio Tab ── */}
+          {activeTab === 'salon' && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="space-y-8"
             >
-              {/* Studio Info */}
               <div className="glass-dark p-8 rounded-[2rem] border border-white/5">
                 <div className="flex items-center gap-6 mb-8 pb-8 border-b border-white/5">
                   <div className="relative group">
                     <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-[#e76f51] to-[#a67c2e] flex items-center justify-center text-3xl font-bold border-4 border-white/5 shadow-2xl">
-                      M
+                      L
                     </div>
                     <label className="absolute -bottom-2 -right-2 p-2 bg-white text-black rounded-xl shadow-xl hover:scale-110 transition-all cursor-pointer">
                       <Camera className="w-4 h-4" />
-                      <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={() => toast.success('Logo mis à jour !')}
+                      />
                     </label>
                   </div>
                   <div>
@@ -106,16 +151,37 @@ export default function SettingsPage() {
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-2">Nom du Studio</label>
-                    <input type="text" defaultValue="Lara Nails" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-[#e76f51] transition-all" />
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-2">
+                      Nom du Studio
+                    </label>
+                    <input
+                      type="text"
+                      value={studioName}
+                      onChange={e => setStudioName(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-[#e76f51] transition-all"
+                    />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-2">Téléphone Professionnel</label>
-                    <input type="text" defaultValue="+33 6 12 34 56 78" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-[#e76f51] transition-all" />
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-2">
+                      Téléphone Professionnel
+                    </label>
+                    <input
+                      type="text"
+                      value={studioPhone}
+                      onChange={e => setStudioPhone(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-[#e76f51] transition-all"
+                    />
                   </div>
                   <div className="md:col-span-2 space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-2">Adresse</label>
-                    <input type="text" defaultValue="12 Rue des Fleurs, 75001 Paris" className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-[#e76f51] transition-all" />
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-2">
+                      Adresse
+                    </label>
+                    <input
+                      type="text"
+                      value={studioAddress}
+                      onChange={e => setStudioAddress(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-[#e76f51] transition-all"
+                    />
                   </div>
                 </div>
               </div>
@@ -127,28 +193,48 @@ export default function SettingsPage() {
                     <Clock className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-bold">Horaires d'Ouverture</h3>
+                    <h3 className="font-bold">Horaires d&apos;Ouverture</h3>
                     <p className="text-xs text-gray-500">Définissez vos créneaux de disponibilité</p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  {["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"].map((day) => (
-                    <div key={day} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl group hover:bg-white/10 transition-all">
-                      <span className="text-sm font-medium">{day}</span>
+                  {schedule.map((d, i) => (
+                    <div
+                      key={d.day}
+                      className="flex items-center justify-between p-4 bg-white/5 rounded-2xl group hover:bg-white/10 transition-all"
+                    >
+                      <span className="text-sm font-medium w-24">{d.day}</span>
                       <div className="flex items-center gap-4">
-                        {day === "Dimanche" ? (
-                          <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest">Fermé</span>
-                        ) : (
+                        {d.active ? (
                           <div className="flex items-center gap-2">
-                            <input type="text" defaultValue="09:00" className="w-16 bg-transparent border-b border-white/10 text-center text-xs font-bold focus:border-[#e76f51] outline-none" />
+                            <input
+                              type="time"
+                              value={d.open}
+                              onChange={e => updateScheduleTime(i, 'open', e.target.value)}
+                              className="w-20 bg-transparent border-b border-white/10 text-center text-xs font-bold focus:border-[#e76f51] outline-none p-1"
+                            />
                             <span className="text-gray-500">-</span>
-                            <input type="text" defaultValue="19:00" className="w-16 bg-transparent border-b border-white/10 text-center text-xs font-bold focus:border-[#e76f51] outline-none" />
+                            <input
+                              type="time"
+                              value={d.close}
+                              onChange={e => updateScheduleTime(i, 'close', e.target.value)}
+                              className="w-20 bg-transparent border-b border-white/10 text-center text-xs font-bold focus:border-[#e76f51] outline-none p-1"
+                            />
                           </div>
+                        ) : (
+                          <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest">
+                            Fermé
+                          </span>
                         )}
                         <label className="relative inline-flex items-center cursor-pointer">
-                          <input type="checkbox" defaultChecked={day !== "Dimanche"} className="sr-only peer" />
-                          <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[#1a1a1a] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-400 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e76f51] peer-checked:after:bg-white"></div>
+                          <input
+                            type="checkbox"
+                            checked={d.active}
+                            onChange={() => toggleDay(i)}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-400 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e76f51] peer-checked:after:bg-white" />
                         </label>
                       </div>
                     </div>
@@ -158,18 +244,134 @@ export default function SettingsPage() {
             </motion.div>
           )}
 
-          {activeTab === "profile" && (
+          {/* ── Profile Tab ── */}
+          {activeTab === 'profile' && (
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="glass-dark p-8 rounded-[2rem] border border-white/5 text-center py-20"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="glass-dark p-8 rounded-[2rem] border border-white/5 space-y-6"
             >
-              <User className="w-16 h-16 mx-auto mb-4 opacity-20" />
-              <h3 className="font-serif italic text-lg text-gray-500">Paramètres de profil bientôt disponibles...</h3>
+              <h3 className="font-serif font-bold text-lg mb-4">Profil Administrateur</h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-2">
+                    Nom
+                  </label>
+                  <input
+                    type="text"
+                    defaultValue="Lara"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-[#e76f51] transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-2">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    defaultValue="lara@nails.pro"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-[#e76f51] transition-all"
+                  />
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── Notifications Tab ── */}
+          {activeTab === 'notifications' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="glass-dark p-8 rounded-[2rem] border border-white/5 space-y-6"
+            >
+              <h3 className="font-serif font-bold text-lg mb-4">Préférences de Notification</h3>
+              {[
+                { label: 'Rappel de rendez-vous (24h avant)', desc: 'Notification push + email' },
+                { label: 'Nouveau message Instagram', desc: 'Notification push' },
+                { label: 'Annulation de rendez-vous', desc: 'Notification push + email' },
+                { label: 'Rapport mensuel', desc: 'Email uniquement' },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
+                  <div>
+                    <p className="text-sm font-medium">{item.label}</p>
+                    <p className="text-[10px] text-gray-500 mt-0.5">{item.desc}</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" defaultChecked className="sr-only peer" />
+                    <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-400 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e76f51] peer-checked:after:bg-white" />
+                  </label>
+                </div>
+              ))}
+            </motion.div>
+          )}
+
+          {/* ── Security Tab ── */}
+          {activeTab === 'security' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="glass-dark p-8 rounded-[2rem] border border-white/5 space-y-6"
+            >
+              <h3 className="font-serif font-bold text-lg mb-4">Sécurité du Compte</h3>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-2">
+                    Mot de passe actuel
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-[#e76f51] transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 px-2">
+                    Nouveau mot de passe
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm outline-none focus:border-[#e76f51] transition-all"
+                  />
+                </div>
+                <button
+                  onClick={() => toast.success('Mot de passe mis à jour avec succès !')}
+                  className="px-6 py-3 bg-[#e76f51] text-white rounded-xl font-bold text-sm hover:scale-[1.02] transition-all"
+                >
+                  <Check className="w-4 h-4 inline mr-2" />
+                  Changer le mot de passe
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── Billing Tab ── */}
+          {activeTab === 'billing' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="glass-dark p-8 rounded-[2rem] border border-white/5 space-y-6"
+            >
+              <h3 className="font-serif font-bold text-lg mb-4">Paiements & Facturation</h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                {[
+                  { label: 'CA du mois', value: '—' },
+                  { label: 'Rendez-vous facturés', value: '—' },
+                  { label: 'Panier moyen', value: '—' },
+                ].map((stat, i) => (
+                  <div key={i} className="bg-white/5 p-6 rounded-2xl text-center">
+                    <p className="text-2xl font-bold text-[#e76f51] mb-1">{stat.value}</p>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-600 text-center mt-4">
+                Module de facturation avancée — bientôt disponible
+              </p>
             </motion.div>
           )}
         </div>
       </div>
     </div>
-  );
+  )
 }
