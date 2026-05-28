@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
-  TrendingUp, Users, Calendar, DollarSign,
+  TrendingUp, Users, Calendar, DollarSign, Wallet,
   CalendarPlus, BellRing, FileDown,
   Loader2, AlertTriangle, RefreshCw,
 } from 'lucide-react'
@@ -21,6 +21,7 @@ interface Appointment {
   appointment_time: string
   price: number
   status: string
+  payment_type: string
 }
 
 export default function AdminDashboard() {
@@ -58,11 +59,15 @@ export default function AdminDashboard() {
   const returning = [...clientVisitCounts.values()].filter(v => v > 1).length
   const retention = totalClients > 0 ? Math.round((returning / totalClients) * 100) : 0
 
+  const pendingPayments = appointments
+    .filter(a => a.payment_type === 'fiado' || a.payment_type === 'parcelado')
+    .reduce((acc, a) => acc + Number(a.price || 0), 0)
+
   const stats = [
     { label: "Chiffre d'Affaires", value: `${totalRevenue} €`, icon: DollarSign },
     { label: 'Clientes', value: totalClients.toString(), icon: Users },
     { label: 'Rendez-vous', value: confirmedCount.toString(), icon: Calendar },
-    { label: 'Taux de Rétention', value: `${retention}%`, icon: TrendingUp },
+    { label: 'À recevoir', value: `${pendingPayments} €`, icon: Wallet },
   ]
 
   const recent = appointments.slice(0, 5)

@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS appointments (
   price       DECIMAL(10,2) DEFAULT 0,
   status      TEXT NOT NULL DEFAULT 'confirmed'
     CHECK (status IN ('confirmed', 'pending', 'cancelled')),
+  payment_type TEXT NOT NULL DEFAULT 'à vista'
+    CHECK (payment_type IN ('à vista', 'fiado', 'parcelado')),
   notes       TEXT,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );

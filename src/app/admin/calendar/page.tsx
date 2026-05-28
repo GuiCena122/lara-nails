@@ -17,7 +17,7 @@ const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Aoû
 interface Appointment {
   id: number; client_name: string; client_email: string | null; client_phone: string | null
   service_name: string; appointment_date: string; appointment_time: string
-  price: number; status: string
+  price: number; status: string; payment_type: string
 }
 
 export default function CalendarPage() {
@@ -70,6 +70,7 @@ export default function CalendarPage() {
       appointment_time: fd.get('appointment_time') as string,
       price: Number(fd.get('price')) || 0,
       status: (fd.get('status') as string) || 'confirmed',
+      payment_type: (fd.get('payment_type') as string) || 'à vista',
     }
 
     if (editing) {
@@ -191,6 +192,9 @@ export default function CalendarPage() {
                         <h4 className="font-bold text-sm mb-1">{a.client_name}</h4>
                         <span className={cn('text-[10px] font-bold px-2 py-0.5 rounded-full uppercase mr-2', sBadge(a.status))}>{sLabel(a.status)}</span>
                         <span className="text-[10px] font-bold bg-[#e76f51]/20 text-[#e76f51] px-2 py-0.5 rounded-full uppercase">{a.service_name}</span>
+                        {a.payment_type && a.payment_type !== 'à vista' && (
+                          <span className="text-[10px] font-bold bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full uppercase">{a.payment_type}</span>
+                        )}
                       </div>
                       <div className="relative">
                         <button onClick={() => setMenu(menu === a.id ? null : a.id)} className="p-1.5 text-gray-500 hover:text-white"><MoreVertical className="w-4 h-4" /></button>
@@ -269,6 +273,12 @@ export default function CalendarPage() {
                   <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Statut</label>
                   <select name="status" defaultValue={editing?.status || 'confirmed'} className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]">
                     <option value="confirmed">Confirmé</option><option value="pending">En attente</option><option value="cancelled">Annulé</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Paiement</label>
+                  <select name="payment_type" defaultValue={editing?.payment_type || 'à vista'} className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]">
+                    <option value="à vista">À vista</option><option value="fiado">Fiado</option><option value="parcelado">Parcelado</option>
                   </select>
                 </div>
                 <button type="submit" disabled={saving} className="w-full py-4 bg-[#e76f51] text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform disabled:opacity-50">
