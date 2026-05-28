@@ -1,6 +1,6 @@
 -- Tabela de agendamentos do Lara Nails Pro
 -- Execute no SQL Editor do Supabase:
--- https://supabase.com/dashboard/project/qelfhfjbmnakaeinllkg/sql/new
+-- https://supabase.com/dashboard/project/mzdqptlzjketgunnpuwq/sql/new
 
 CREATE TABLE IF NOT EXISTS appointments (
   id          BIGSERIAL PRIMARY KEY,

@@ -7,8 +7,8 @@
 
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://qelfhfjbmnakaeinllkg.supabase.co'
-const supabaseAnonKey = 'sb_publishable_I7BxmLQ1wzL-603FV8jq1Q_PXOfsVGV'
+const supabaseUrl = 'https://mzdqptlzjketgunnpuwq.supabase.co'
+const supabaseAnonKey = 'sb_publishable_8s4eJBb1zq3taK_sdG9s9w_yZBqAsTM'
 
 // Nota: Para criar usuários via API pública, a opção "Enable email confirmations"
 // precisa estar DESATIVADA no painel do Supabase (Authentication > Settings).
