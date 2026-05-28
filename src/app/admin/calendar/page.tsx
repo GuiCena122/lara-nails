@@ -17,6 +17,31 @@ const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Aoû
 const STAFF_NAME = 'Lara Cristina'
 const DEFAULT_DURATION = '60m'
 
+const SERVICE_PRICES: Record<string, number> = {
+  'Tradicional (Mãos)': 25,
+  'Mãos com Semi Permanente': 40,
+  'Pés (spa) com Semi Permanente': 45,
+  'Pés e Mãos com Semi Permanente': 75,
+  'Blindagem': 50,
+  'Banho de gel': 65,
+  'Adicional Esmaltação Semi Permanente': 10,
+  'Manutenção Alongamento de fibra': 65,
+  'Manutenção com esmaltação semi': 75,
+  'Alongamento de fibra': 85,
+  'Alongamento fibra com semi permanente': 95,
+  'Arte Encapsulada (2 unhas)': 10,
+  'Arte Encap. Top Coat (2 unhas)': 5,
+  'Nails arte': 5,
+  'Plástica dos pés': 70,
+  'Plástica dos pés + semi': 75,
+  'Reposição de Unha (2 unhas)': 5,
+  'Remoção de Alongamento': 20,
+  'Francesinha Reversa (2 unhas)': 10,
+  'Baby Boomer': 10,
+  'Película o Par': 3,
+  'Pedraria (2 unhas)': 3,
+}
+
 export default function CalendarPage() {
   const t = new Date()
   const [month, setMonth] = useState(t.getMonth())
@@ -29,6 +54,7 @@ export default function CalendarPage() {
   const [editing, setEditing] = useState<Appointment | null>(null)
   const [menu, setMenu] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
+  const [formPrice, setFormPrice] = useState('0')
   const supabase = createClient()
 
   const daysInMonth = new Date(year, month + 1, 0).getDate()
@@ -52,8 +78,8 @@ export default function CalendarPage() {
   const prevMonth = () => { if (month === 0) { setMonth(11); setYear(y => y - 1) } else setMonth(m => m - 1); setDay(1) }
   const nextMonth = () => { if (month === 11) { setMonth(0); setYear(y => y + 1) } else setMonth(m => m + 1); setDay(1) }
 
-  const openNew = () => { setEditing(null); setModal(true) }
-  const openEdit = (a: Appointment) => { setEditing(a); setMenu(null); setModal(true) }
+  const openNew = () => { setEditing(null); setFormPrice('0'); setModal(true) }
+  const openEdit = (a: Appointment) => { setEditing(a); setFormPrice(String(a.price || 0)); setMenu(null); setModal(true) }
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true)
@@ -244,7 +270,7 @@ export default function CalendarPage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Prestation</label>
-                  <select name="service_name" defaultValue={editing?.service_name || 'Mãos com Semi Permanente'} className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]">
+                  <select name="service_name" defaultValue={editing?.service_name || 'Mãos com Semi Permanente'} onChange={e => setFormPrice(String(SERVICE_PRICES[e.target.value] || 0))} className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]">
                     <optgroup label="Tradicional"><option>Tradicional (Mãos)</option><option>Mãos com Semi Permanente</option><option>Pés (spa) com Semi Permanente</option><option>Pés e Mãos com Semi Permanente</option></optgroup>
                     <optgroup label="Aplicação"><option>Blindagem</option><option>Banho de gel</option><option>Adicional Esmaltação Semi Permanente</option></optgroup>
                     <optgroup label="Manutenção"><option>Manutenção Alongamento de fibra</option><option>Manutenção com esmaltação semi</option></optgroup>
@@ -263,7 +289,7 @@ export default function CalendarPage() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Prix €</label>
-                    <input name="price" type="number" min="0" step="0.01" defaultValue={editing?.price || 0} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]" />
+                    <input name="price" type="number" min="0" step="0.01" value={formPrice} onChange={e => setFormPrice(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]" />
                   </div>
                 </div>
                 <div className="space-y-2">
