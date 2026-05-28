@@ -10,15 +10,12 @@ import {
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import { Appointment, statusBadge, statusLabel, statusBorder, statusDot } from '@/lib/types'
 
 const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
-
-interface Appointment {
-  id: number; client_name: string; client_email: string | null; client_phone: string | null
-  service_name: string; appointment_date: string; appointment_time: string
-  price: number; status: string; payment_type: string
-}
+const STAFF_NAME = 'Lara Cristina'
+const DEFAULT_DURATION = '60m'
 
 export default function CalendarPage() {
   const t = new Date()
@@ -91,10 +88,6 @@ export default function CalendarPage() {
     if (de) { toast.error(de.message); return }
     toast.success('Rendez-vous supprimé.'); fetchAppts()
   }
-
-  const sBorder = (s: string) => s === 'confirmed' ? 'border-l-[#4ade80]' : s === 'pending' ? 'border-l-amber-400' : 'border-l-rose-400'
-  const sBadge = (s: string) => s === 'confirmed' ? 'bg-green-500/20 text-green-400' : s === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-rose-500/20 text-rose-400'
-  const sLabel = (s: string) => s === 'confirmed' ? 'Confirmé' : s === 'pending' ? 'En attente' : 'Annulé'
 
   if (error) {
     return (
@@ -182,15 +175,15 @@ export default function CalendarPage() {
               <motion.div key={a.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-start gap-4 group">
                 <div className="text-right w-14 pt-1 shrink-0">
                   <p className="font-bold text-sm">{a.appointment_time?.slice(0, 5)}</p>
-                  <p className="text-[10px] text-gray-500">60m</p>
+                  <p className="text-[10px] text-gray-500">{DEFAULT_DURATION}</p>
                 </div>
                 <div className="flex-1 relative pb-4 border-l-2 border-[#e76f51]/20 pl-4 md:pl-6 group-last:border-transparent">
                   <div className={cn('absolute -left-[9px] top-2 w-4 h-4 rounded-full border-4 border-[#251f1f]', a.status === 'confirmed' ? 'bg-green-500' : a.status === 'pending' ? 'bg-amber-400' : 'bg-rose-400')} />
-                  <div className={cn('bg-white/5 hover:bg-white/10 transition-all rounded-2xl p-4 border border-white/5 group-hover:border-[#e76f51]/30 border-l-4', sBorder(a.status))}>
+                  <div className={cn('bg-white/5 hover:bg-white/10 transition-all rounded-2xl p-4 border border-white/5 group-hover:border-[#e76f51]/30 border-l-4', statusBorder(a.status))}>
                     <div className="flex justify-between items-start mb-3">
                       <div>
                         <h4 className="font-bold text-sm mb-1">{a.client_name}</h4>
-                        <span className={cn('text-[10px] font-bold px-2 py-0.5 rounded-full uppercase mr-2', sBadge(a.status))}>{sLabel(a.status)}</span>
+                        <span className={cn('text-[10px] font-bold px-2 py-0.5 rounded-full uppercase mr-2', statusBadge(a.status))}>{statusLabel(a.status)}</span>
                         <span className="text-[10px] font-bold bg-[#e76f51]/20 text-[#e76f51] px-2 py-0.5 rounded-full uppercase">{a.service_name}</span>
                         {a.payment_type && a.payment_type !== 'à vista' && (
                           <span className="text-[10px] font-bold bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full uppercase">{a.payment_type}</span>
@@ -208,7 +201,7 @@ export default function CalendarPage() {
                     </div>
                     <div className="flex items-center gap-4 text-xs text-gray-400">
                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {a.appointment_time?.slice(0, 5)}</span>
-                      <span className="flex items-center gap-1"><User className="w-3 h-3" /> Lara Nails</span>
+                      <span className="flex items-center gap-1"><User className="w-3 h-3" /> {STAFF_NAME}</span>
                       {a.price > 0 && <span className="font-bold text-[#e76f51]">{a.price} €</span>}
                     </div>
                   </div>

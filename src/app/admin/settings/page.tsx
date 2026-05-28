@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { User, Store, Bell, Lock, CreditCard, Camera, Save, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { createClient } from '@/lib/supabase/client'
 
 type DayS = { day: string; open: string; close: string; active: boolean }
 
@@ -27,12 +28,30 @@ const tabs = [
 ]
 
 export default function SettingsPage() {
+  const supabase = createClient()
   const [tab, setTab] = useState('salon')
-  const [name, setName] = useState('Lara Nails')
+  const [name, setName] = useState('Lara Cristina')
   const [phone, setPhone] = useState('+33 07 58 78 07 74')
   const [addr, setAddr] = useState('05 Route de Combault, 94350 Villiers-sur-Marne')
   const [sched, setSched] = useState<DayS[]>(DEFAULT)
   const [saving, setSaving] = useState(false)
+  const [adminEmail, setAdminEmail] = useState('')
+
+  useEffect(() => {
+    const saved = localStorage.getItem('lara-settings')
+    if (saved) {
+      try {
+        const p = JSON.parse(saved)
+        if (p.name) setName(p.name)
+        if (p.phone) setPhone(p.phone)
+        if (p.addr) setAddr(p.addr)
+        if (p.sched) setSched(p.sched)
+      } catch { /* ignore parse errors */ }
+    }
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user?.email) setAdminEmail(user.email)
+    })
+  }, [supabase])
 
   const save = () => {
     setSaving(true)
@@ -114,7 +133,7 @@ export default function SettingsPage() {
               <h3 className="font-serif font-bold">Profil Administrateur</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-1.5"><label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Nom</label><input defaultValue="Lara" className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]" /></div>
-                <div className="space-y-1.5"><label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Email</label><input defaultValue="lara@nails.pro" className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]" /></div>
+                <div className="space-y-1.5"><label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Email</label><input value={adminEmail} readOnly className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none text-gray-400 cursor-not-allowed" /></div>
               </div>
             </motion.div>
           )}

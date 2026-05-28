@@ -6,8 +6,7 @@ import { Search, Plus, MoreHorizontal, Mail, Phone, History, X, Trash2, Loader2,
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-
-interface ClientEntry { id: string; name: string; email: string | null; phone: string | null; visits: number; spent: number; lastVisit: string; status: string }
+interface ClientEntry { id: string; name: string; email: string | null; phone: string | null; visits: number; spent: number; spentValue: number; lastVisit: string; status: string }
 
 export default function ClientsPage() {
   const [clients, setClients] = useState<ClientEntry[]>([])
@@ -28,7 +27,7 @@ export default function ClientsPage() {
       const m = new Map<string, ClientEntry>()
       data.forEach((a: any) => {
         const k = a.client_email || a.client_phone || a.client_name || 'inconnu'
-        if (!m.has(k)) m.set(k, { id: k, name: a.client_name || 'Inconnu', email: a.client_email, phone: a.client_phone, visits: 0, spent: 0, lastVisit: '', status: 'Nouveau' })
+        if (!m.has(k)) m.set(k, { id: k, name: a.client_name || 'Inconnu', email: a.client_email, phone: a.client_phone, visits: 0, spent: 0, spentValue: 0, lastVisit: '', status: 'Nouveau' })
         const c = m.get(k)!; c.visits++; c.spent += Number(a.price || 0)
         if (a.appointment_date > c.lastVisit) c.lastVisit = a.appointment_date
         if (c.visits >= 10) c.status = 'Vip'; else if (c.visits >= 3) c.status = 'Régulier'
@@ -51,7 +50,7 @@ export default function ClientsPage() {
     const { error: ie } = await supabase.from('appointments').insert([{
       client_name: fd.get('name'), client_email: fd.get('email') || null, client_phone: fd.get('phone') || null,
       service_name: 'Fiche cliente', appointment_date: new Date().toISOString().split('T')[0],
-      appointment_time: '09:00', price: 0, status: 'confirmed',
+      appointment_time: '09:00', price: 0, status: 'confirmed', notes: 'Enregistrement client',
     }])
     if (ie) { toast.error(ie.message); return }
     setModal(false); toast.success('Cliente ajoutée !'); fetchClients()

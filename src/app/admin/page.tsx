@@ -3,26 +3,14 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
-  TrendingUp, Users, Calendar, DollarSign, Wallet,
+  Users, Calendar, DollarSign, Wallet,
   CalendarPlus, BellRing, FileDown,
   Loader2, AlertTriangle, RefreshCw,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
-
-interface Appointment {
-  id: number
-  client_name: string
-  client_email: string | null
-  client_phone: string | null
-  service_name: string
-  appointment_date: string
-  appointment_time: string
-  price: number
-  status: string
-  payment_type: string
-}
+import { Appointment, statusBadge, statusLabel } from '@/lib/types'
 
 export default function AdminDashboard() {
   const [appointments, setAppointments] = useState<Appointment[]>([])
@@ -56,8 +44,6 @@ export default function AdminDashboard() {
     clientVisitCounts.set(key, (clientVisitCounts.get(key) || 0) + 1)
   })
   const totalClients = clientVisitCounts.size
-  const returning = [...clientVisitCounts.values()].filter(v => v > 1).length
-  const retention = totalClients > 0 ? Math.round((returning / totalClients) * 100) : 0
 
   const pendingPayments = appointments
     .filter(a => a.payment_type === 'fiado' || a.payment_type === 'parcelado')
@@ -71,13 +57,6 @@ export default function AdminDashboard() {
   ]
 
   const recent = appointments.slice(0, 5)
-
-  const statusColor = (s: string) =>
-    s === 'confirmed' ? 'bg-green-500/20 text-green-400' :
-    s === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-rose-500/20 text-rose-400'
-
-  const statusLabel = (s: string) =>
-    s === 'confirmed' ? 'Confirmé' : s === 'pending' ? 'En attente' : s === 'cancelled' ? 'Annulé' : s
 
   if (error) {
     return (
@@ -161,7 +140,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-[#e76f51] text-sm">{apt.appointment_time?.slice(0, 5)}</p>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusColor(apt.status)}`}>{statusLabel(apt.status)}</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusBadge(apt.status)}`}>{statusLabel(apt.status)}</span>
                   </div>
                 </div>
               ))}
