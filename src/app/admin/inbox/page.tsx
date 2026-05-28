@@ -1,148 +1,125 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import {
-  Search,
-  Camera,
-  ExternalLink,
-  Plus,
-  Send
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Typography } from "@/components/ui/Typography";
-import { Button } from "@/components/ui/Button";
+import { useState, useMemo } from 'react'
+import { Search, Send, Plus, Calendar, CheckCheck, ChevronLeft, MessageCircle } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
-const contacts = [
-  { id: 1, handle: "@ana_nails_fan", lastMsg: "Salut! Je voudrais agender...", time: "12:30", unread: 2, avatar: "A" },
-  { id: 2, handle: "@be_costa", lastMsg: "Merci beaucoup pour hier!", time: "10:15", unread: 0, avatar: "B" },
-  { id: 3, handle: "@clara_m", lastMsg: "Combien coûte le Nail Art?", time: "Hier", unread: 0, avatar: "C" },
-];
+interface Message { id: number; text: string; sent: boolean; time: string }
+interface Contact { id: number; handle: string; lastMsg: string; time: string; unread: number; avatar: string; messages: Message[] }
 
-export const dynamic = 'force-dynamic';
+const init: Contact[] = [
+  { id: 1, handle: '@ana_nails_fan', lastMsg: 'Je voudrais agender...', time: '12:30', unread: 2, avatar: 'A', messages: [
+    { id: 1, text: "Bonjour Lara! J'adore votre travail 😍", sent: false, time: '12:20' },
+    { id: 2, text: "Merci Ana! C'est très gentil.", sent: true, time: '12:25' },
+    { id: 3, text: 'Je voudrais agender un Allongement Gel pour samedi.', sent: false, time: '12:30' },
+  ]},
+  { id: 2, handle: '@be_costa', lastMsg: 'Merci beaucoup!', time: '10:15', unread: 0, avatar: 'B', messages: [
+    { id: 1, text: 'Merci beaucoup pour hier!', sent: false, time: '10:15' },
+    { id: 2, text: "Avec plaisir! À bientôt ✨", sent: true, time: '10:20' },
+  ]},
+  { id: 3, handle: '@clara_m', lastMsg: 'Combien coûte le Nail Art?', time: 'Hier', unread: 0, avatar: 'C', messages: [
+    { id: 1, text: 'Combien coûte le Nail Art?', sent: false, time: 'Hier' },
+    { id: 2, text: 'Dès 15€ selon la complexité! 😊', sent: true, time: 'Hier' },
+  ]},
+]
 
 export default function InboxPage() {
-  const [selectedContact] = useState(contacts[0]);
+  const [cts, setCts] = useState(init)
+  const [sel, setSel] = useState(1)
+  const [input, setInput] = useState('')
+  const [sterm, setSterm] = useState('')
+  const [view, setView] = useState<'list'|'chat'>('list')
+  const router = useRouter()
+
+  const contact = cts.find(c => c.id === sel) || cts[0]
+  const filtered = useMemo(() => cts.filter(c => c.handle.toLowerCase().includes(sterm.toLowerCase())), [cts, sterm])
+  const totalUnread = cts.reduce((s, c) => s + c.unread, 0)
+
+  const send = () => {
+    const t = input.trim(); if (!t) return
+    const now = new Date(); const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
+    setCts(prev => prev.map(c => c.id === sel ? { ...c, messages: [...c.messages, { id: Date.now(), text: t, sent: true, time }], lastMsg: t, time, unread: 0 } : c))
+    setInput('')
+  }
 
   return (
-    <div className="relative min-h-[calc(100vh-120px)] md:h-[calc(100vh-160px)] flex gap-12 animate-in fade-in duration-1000 pb-10 bg-brand-ivory">
-      {/* Overlay - The Silk Curtain (Instagram Integration) - Light Mode */}
-      <div className="absolute inset-0 z-50 flex items-center justify-center p-8 bg-white/40 backdrop-blur-xl rounded-[4rem] border border-black/5 shadow-luxury">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 1.2, ease: [0.43, 0.13, 0.23, 0.96] }}
-          className="max-w-xl text-center bg-white/90 border-[0.5px] border-brand-gold/30 p-8 sm:p-16 md:p-24 rounded-[3rem] md:rounded-[5rem] shadow-luxury relative overflow-hidden"
-        >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-bl-full pointer-events-none" />
-
-          <div className="w-24 h-24 bg-gradient-to-tr from-[#f09433] via-[#e6683c] via-[#dc2743] via-[#cc2366] to-[#bc1888] rounded-[2rem] flex items-center justify-center mx-auto mb-10 shadow-glow-gold relative">
-            <Camera className="w-12 h-12 text-white" strokeWidth={1} />
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-[-8px] rounded-[2.5rem] border-t-[0.5px] border-brand-gold/40"
-            />
+    <div className="h-[calc(100vh-120px)] md:h-[calc(100vh-140px)] flex gap-4 animate-in fade-in">
+      {/* List */}
+      <div className={cn('w-full md:w-72 glass-dark rounded-2xl border border-white/5 flex flex-col shrink-0', view === 'list' ? 'flex' : 'hidden md:flex')}>
+        <div className="p-4 border-b border-white/5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-serif font-bold">Messages</h3>
+            {totalUnread > 0 && <span className="bg-[#e76f51] text-white text-[10px] px-2 py-0.5 rounded-full font-bold">{totalUnread}</span>}
           </div>
-
-          <Typography variant="h2" serif className="text-brand-black mb-6 tracking-tighter text-balance">Correspondance Instagram</Typography>
-          <Typography variant="p" className="text-black/40 text-sm leading-relaxed mb-12 italic font-light text-balance">
-             Élevez votre réactivité au rang d&apos;art. Centralisez vos échanges Instagram directement dans votre planner d&apos;exception.
-          </Typography>
-
-          <div className="space-y-6 text-balance text-balance">
-            <Button
-              variant="luxury"
-              className="w-full h-20 group border-[0.5px] border-brand-gold/20 relative overflow-hidden text-white"
-              onClick={() => window.open("https://github.com/GuiCena122/lara-nails/blob/main/src/lib/instagram/README.md", "_blank")}
-            >
-              <span className="relative z-10 tracking-[0.4em]">ACTIVER LE REGISTRE</span>
-              <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-luxury" />
-              <ExternalLink size={14} className="ml-3 relative z-10 opacity-60" />
-            </Button>
-            <Typography variant="label" className="text-[7px] opacity-20 tracking-[0.6em] font-black uppercase text-balance text-balance">REQUISITION VIA MÉTHODE META DEVELOPERS</Typography>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <input type="text" placeholder="Rechercher..." value={sterm} onChange={e => setSterm(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-9 pr-3 text-xs outline-none focus:border-[#e76f51]" />
           </div>
-        </motion.div>
+        </div>
+        <div className="flex-1 overflow-auto">
+          {filtered.map(c => (
+            <div key={c.id} onClick={() => { setCts(prev => prev.map(x => x.id === c.id ? { ...x, unread: 0 } : x)); setSel(c.id); setView('chat') }}
+              className={cn('p-3 flex items-center gap-3 cursor-pointer transition-all border-l-2', sel === c.id ? 'bg-[#e76f51]/10 border-[#e76f51]' : 'border-transparent hover:bg-white/5')}>
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center font-bold text-white relative shrink-0 text-sm">{c.avatar}<div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-[#251f1f] rounded-full" /></div>
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-center mb-0.5"><p className="text-sm font-bold truncate">{c.handle}</p><span className="text-[10px] text-gray-500 shrink-0">{c.time}</span></div>
+                <div className="flex justify-between items-center"><p className="text-xs text-gray-400 truncate">{c.lastMsg}</p>{c.unread > 0 && <span className="bg-[#e76f51] text-white text-[10px] min-w-[16px] h-[16px] rounded-full flex items-center justify-center font-bold shrink-0 ml-1">{c.unread}</span>}</div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Main Content - The Stone Ledger (Blurred & Disabled) - Light Mode */}
-      <div className="flex-1 flex gap-12 opacity-10 grayscale pointer-events-none select-none text-balance text-balance">
-        {/* Contact List */}
-        <div className={cn(
-          "w-full md:w-96 bg-white rounded-[4rem] border-[0.5px] border-black/5 flex flex-col overflow-hidden shrink-0 shadow-sm"
-        )}>
-          <div className="p-10 border-b-[0.5px] border-black/5 bg-brand-ivory/10">
-            <div className="flex items-center justify-between mb-8 text-balance text-balance">
-               <Typography variant="h3" serif className="italic text-brand-black">Messages</Typography>
-               <button className="text-brand-gold/40 hover:text-brand-gold transition-colors"><Plus size={18} /></button>
+      {/* Chat */}
+      <div className={cn('flex-1 glass-dark rounded-2xl border border-white/5 flex flex-col', view === 'chat' ? 'flex' : 'hidden md:flex')}>
+        <div className="p-4 border-b border-white/5 flex items-center justify-between bg-white/5">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setView('list')} className="md:hidden p-1.5 -ml-1 text-gray-400 hover:text-white rounded-xl"><ChevronLeft className="w-5 h-5" /></button>
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center font-bold text-sm">{contact.avatar}</div>
+            <div><p className="text-sm font-bold">{contact.handle}</p><p className="text-[10px] text-green-400 flex items-center gap-1"><span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" /> en ligne</p></div>
+          </div>
+          <button onClick={() => { router.push('/admin/calendar'); toast.info('Calendrier ouvert') }} className="p-2 text-gray-400 hover:text-[#e76f51] bg-white/5 rounded-xl border border-white/5 flex items-center gap-2 text-xs font-bold px-3"><Calendar className="w-4 h-4" /> Créer RDV</button>
+        </div>
+        <div className="flex-1 overflow-auto p-6 space-y-4">
+          {contact.messages.map(m => (
+            <div key={m.id} className={cn('flex', m.sent ? 'justify-end' : 'justify-start')}>
+              <div className={cn('max-w-[75%] p-3 rounded-2xl', m.sent ? 'bg-[#e76f51] text-white rounded-tr-none' : 'bg-white/10 text-gray-200 rounded-tl-none')}>
+                <p className="text-sm">{m.text}</p>
+                <div className={cn('mt-1.5 flex items-center gap-1 text-[10px]', m.sent ? 'text-white/70 justify-end' : 'text-gray-500')}>{m.time}{m.sent && <CheckCheck className="w-3 h-3" />}</div>
+              </div>
             </div>
-            <div className="relative group">
-              <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-gold/20 group-focus-within:text-brand-gold transition-colors" />
-              <input
-                disabled
-                type="text"
-                placeholder="Parcourir les échanges..."
-                className="w-full bg-transparent border-b-[0.5px] border-black/10 py-3 pl-8 pr-4 text-xs font-serif italic outline-none"
-              />
+          ))}
+        </div>
+        <div className="p-4 bg-white/5 border-t border-white/5">
+          <div className="flex items-center gap-3">
+            <button onClick={() => toast.info('Pièce jointe bientôt')} className="p-2.5 bg-white/5 rounded-xl text-gray-400 hover:text-white"><Plus className="w-4 h-4" /></button>
+            <div className="flex-1 relative">
+              <input type="text" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') send() }} placeholder="Votre réponse..." className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 pr-10 text-sm outline-none focus:border-[#e76f51]" />
+              <button onClick={send} disabled={!input.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[#e76f51] hover:scale-110 disabled:opacity-30"><Send className="w-4 h-4" /></button>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div className="flex-1 overflow-auto p-4 space-y-1 text-balance text-balance text-balance">
-            {contacts.map((contact) => (
-              <div
-                key={contact.id}
-                className={cn(
-                  "p-6 flex items-center gap-6 rounded-[2.5rem] transition-all duration-700 relative overflow-hidden group",
-                  selectedContact.id === contact.id
-                    ? "bg-brand-gold/5 border-[0.5px] border-brand-gold/20"
-                    : "border-[0.5px] border-transparent"
-                )}
-              >
-                <div className="w-14 h-14 rounded-full border border-brand-gold/20 flex items-center justify-center font-black text-brand-gold bg-white relative overflow-hidden">
-                   <div className="absolute inset-0 bg-gradient-to-br from-brand-gold/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                   <Typography variant="span" className="relative z-10">{contact.avatar}</Typography>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-center mb-1">
-                    <Typography variant="span" className="text-xs font-bold tracking-tight text-brand-black">{contact.handle}</Typography>
-                    <span className="text-[10px] opacity-20 uppercase tracking-widest font-black">{contact.time}</span>
-                  </div>
-                  <Typography variant="p" className="text-[10px] opacity-30 truncate italic leading-relaxed text-brand-black">{contact.lastMsg}</Typography>
-                </div>
-                {selectedContact.id === contact.id && (
-                  <div className="absolute left-0 w-1 h-8 bg-brand-gold rounded-full" />
-                )}
-              </div>
-            ))}
+      {/* Info Sidebar */}
+      <div className="hidden lg:flex w-64 glass-dark rounded-2xl border border-white/5 p-5 flex-col shrink-0">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center text-2xl font-bold border-2 border-[#e76f51]/30">{contact.avatar}</div>
+          <h4 className="font-serif font-bold">{contact.handle}</h4>
+          <p className="text-xs text-gray-500">Abonnée depuis 6 mois</p>
+        </div>
+        <div className="mt-6 space-y-3 flex-1">
+          <h5 className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">Détails</h5>
+          <div className="bg-white/5 p-3 rounded-xl space-y-2">
+            <div className="flex justify-between text-xs"><span className="text-gray-500">RDVs :</span><span className="font-bold">{contact.messages.length}</span></div>
+            <div className="flex justify-between text-xs"><span className="text-gray-500">Visite :</span><span className="font-bold">12 Mars</span></div>
+            <div className="flex justify-between text-xs"><span className="text-gray-500">Note :</span><span className="text-amber-400 font-bold">5.0 ⭐</span></div>
           </div>
         </div>
-
-        {/* Chat Placeholder (Editorial) - Light Mode */}
-        <div className="flex-1 bg-white rounded-[4rem] border-[0.5px] border-black/5 flex flex-col overflow-hidden relative shadow-sm text-balance text-balance">
-           <div className="p-10 border-b-[0.5px] border-black/5 bg-brand-ivory/10 flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                 <div className="w-12 h-12 rounded-full border border-brand-gold/10 bg-white" />
-                 <div>
-                    <Typography variant="span" className="text-sm font-bold tracking-tight text-brand-black uppercase">Correspondance Privée</Typography>
-                    <Typography variant="label" className="text-[7px] text-green-600/40 block mt-1 tracking-[0.4em] font-black uppercase">ACTIF</Typography>
-                 </div>
-              </div>
-           </div>
-
-           <div className="flex-1 p-12 flex flex-col justify-center items-center opacity-[0.03] text-balance">
-              <Typography variant="h1" className="text-[15vh] font-black tracking-tighter italic text-brand-black text-balance">LARA</Typography>
-           </div>
-
-           <div className="p-10 bg-brand-ivory/10 border-t-[0.5px] border-black/5">
-              <div className="flex items-center gap-6">
-                 <div className="flex-1 h-14 rounded-full border border-black/5 bg-white/50" />
-                 <div className="w-14 h-14 rounded-full border border-brand-gold/20 flex items-center justify-center bg-white shadow-sm">
-                    <Send size={16} className="text-brand-gold/20" />
-                 </div>
-              </div>
-           </div>
-        </div>
+        <button onClick={() => toast.info('Profil bientôt disponible')} className="w-full py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-[#e76f51] hover:text-white flex items-center justify-center gap-2 mt-auto"><MessageCircle className="w-3.5 h-3.5" /> Profil complet</button>
       </div>
     </div>
-  );
+  )
 }
