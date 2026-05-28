@@ -6,7 +6,9 @@ import { Search, Plus, MoreHorizontal, Mail, Phone, History, X, Trash2, Loader2,
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-interface ClientEntry { id: string; name: string; email: string | null; phone: string | null; visits: number; spent: number; spentValue: number; lastVisit: string; status: string }
+import { statusBadge, statusLabel } from '@/lib/types'
+
+interface ClientEntry { id: string; name: string; email: string | null; phone: string | null; visits: number; spent: number; lastVisit: string; status: string }
 
 export default function ClientsPage() {
   const [clients, setClients] = useState<ClientEntry[]>([])
@@ -30,7 +32,7 @@ export default function ClientsPage() {
       const m = new Map<string, ClientEntry>()
       data.forEach((a: any) => {
         const k = a.client_email || a.client_phone || a.client_name || 'inconnu'
-        if (!m.has(k)) m.set(k, { id: k, name: a.client_name || 'Inconnu', email: a.client_email, phone: a.client_phone, visits: 0, spent: 0, spentValue: 0, lastVisit: '', status: 'Nouveau' })
+        if (!m.has(k)) m.set(k, { id: k, name: a.client_name || 'Inconnu', email: a.client_email, phone: a.client_phone, visits: 0, spent: 0, lastVisit: '', status: 'Nouveau' })
         const c = m.get(k)!; c.visits++; c.spent += Number(a.price || 0)
         if (a.appointment_date > c.lastVisit) c.lastVisit = a.appointment_date
         if (c.visits >= 10) c.status = 'Vip'; else if (c.visits >= 3) c.status = 'Régulier'
@@ -213,7 +215,7 @@ export default function ClientsPage() {
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-[#e76f51] text-sm">{a.price} €</p>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${a.status === 'confirmed' ? 'bg-green-500/20 text-green-400' : a.status === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-rose-500/20 text-rose-400'}`}>{a.status === 'confirmed' ? 'Confirmé' : a.status === 'pending' ? 'En attente' : 'Annulé'}</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusBadge(a.status)}`}>{statusLabel(a.status)}</span>
                       </div>
                     </div>
                   ))}

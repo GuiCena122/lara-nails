@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import {
   Users, Calendar, DollarSign, Wallet, TrendingUp,
   CalendarPlus, BellRing, FileDown,
-  Loader2, AlertTriangle, RefreshCw,
+  AlertTriangle, RefreshCw,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -16,7 +16,6 @@ export default function AdminDashboard() {
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [isGeneratingReport, setIsGeneratingReport] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -157,21 +156,18 @@ export default function AdminDashboard() {
         <div className="glass-dark p-6 md:p-8 rounded-3xl border border-white/5 h-fit">
           <h3 className="text-lg font-serif font-bold mb-8">Actions Rapides</h3>
           <div className="space-y-3">
-            {[
-              { label: 'Ajouter un rendez-vous', icon: CalendarPlus, action: () => router.push('/admin/calendar') },
-              { label: 'Envoyer un rappel WhatsApp', icon: BellRing, action: () => toast.success('Rappels envoyés !') },
-              { label: 'Générer un rapport mensuel', icon: FileDown, action: () => { setIsGeneratingReport(true); setTimeout(() => { setIsGeneratingReport(false); toast.success('Rapport généré !') }, 2000) } },
-            ].map((item, i) => (
-              <button
-                key={i}
-                onClick={item.action}
-                disabled={isGeneratingReport && i === 2}
-                className="w-full flex items-center justify-between px-4 py-3 bg-white/5 rounded-xl text-sm hover:bg-[#e76f51] hover:text-white transition-all disabled:opacity-50 group"
-              >
-                <span>{item.label}</span>
-                {isGeneratingReport && i === 2 ? <Loader2 className="w-4 h-4 animate-spin" /> : <item.icon className="w-4 h-4 opacity-30 group-hover:opacity-100 transition-opacity" />}
-              </button>
-            ))}
+            <button onClick={() => router.push('/admin/calendar')} className="w-full flex items-center justify-between px-4 py-3 bg-white/5 rounded-xl text-sm hover:bg-[#e76f51] hover:text-white transition-all group">
+              <span>Ajouter un rendez-vous</span>
+              <CalendarPlus className="w-4 h-4 opacity-30 group-hover:opacity-100 transition-opacity" />
+            </button>
+            <button onClick={() => window.open('https://wa.me/33758780774', '_blank')} className="w-full flex items-center justify-between px-4 py-3 bg-white/5 rounded-xl text-sm hover:bg-[#e76f51] hover:text-white transition-all group">
+              <span>WhatsApp Lara</span>
+              <BellRing className="w-4 h-4 opacity-30 group-hover:opacity-100 transition-opacity" />
+            </button>
+            <button onClick={() => { const csv = 'Nom,Service,Date,Prix\n' + appointments.map(a => `${a.client_name},${a.service_name},${a.appointment_date},${a.price}€`).join('\n'); const b = new Blob([csv], {type: 'text/csv'}); const u = URL.createObjectURL(b); const l = document.createElement('a'); l.href = u; l.download = 'rendez-vous-lara.csv'; l.click(); toast.success('CSV téléchargé !') }} className="w-full flex items-center justify-between px-4 py-3 bg-white/5 rounded-xl text-sm hover:bg-[#e76f51] hover:text-white transition-all group">
+              <span>Exporter CSV</span>
+              <FileDown className="w-4 h-4 opacity-30 group-hover:opacity-100 transition-opacity" />
+            </button>
           </div>
         </div>
       </div>

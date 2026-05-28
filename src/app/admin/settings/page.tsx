@@ -72,9 +72,20 @@ export default function SettingsPage() {
   const [sched, setSched] = useState<DayS[]>(DEFAULT)
   const [saving, setSaving] = useState(false)
   const [adminEmail, setAdminEmail] = useState('')
+  const [adminName, setAdminName] = useState('Lara')
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
+  const [billing, setBilling] = useState({ ca: 0, count: 0, avg: 0 })
 
   useEffect(() => {
+    const now = new Date()
+    const firstOfMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`
+    supabase.from('appointments').select('price').gte('appointment_date', firstOfMonth).then(({ data }) => {
+      if (data?.length) {
+        const total = data.reduce((acc: number, a: any) => acc + Number(a.price || 0), 0)
+        setBilling({ ca: total, count: data.length, avg: Math.round(total / data.length) })
+      }
+    })
+
     const saved = localStorage.getItem('lara-settings')
     if (saved) {
       try {
@@ -83,6 +94,8 @@ export default function SettingsPage() {
         if (p.phone) setPhone(p.phone)
         if (p.addr) setAddr(p.addr)
         if (p.sched) setSched(p.sched)
+        if (p.adminName) setAdminName(p.adminName)
+        if (p.logoPreview) setLogoPreview(p.logoPreview)
       } catch { /* ignore parse errors */ }
     }
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -92,7 +105,7 @@ export default function SettingsPage() {
 
   const save = () => {
     setSaving(true)
-    localStorage.setItem('lara-settings', JSON.stringify({ name, phone, addr, sched }))
+    localStorage.setItem('lara-settings', JSON.stringify({ name, phone, addr, sched, adminName, logoPreview }))
     setTimeout(() => { setSaving(false); toast.success('Modifications enregistrées !') }, 600)
   }
 
@@ -169,7 +182,7 @@ export default function SettingsPage() {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-dark p-6 rounded-2xl border border-white/5 space-y-4">
               <h3 className="font-serif font-bold">Profil Administrateur</h3>
               <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-1.5"><label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Nom</label><input defaultValue="Lara" className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]" /></div>
+                <div className="space-y-1.5"><label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Nom</label><input value={adminName} onChange={e => setAdminName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]" /></div>
                 <div className="space-y-1.5"><label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Email</label><input value={adminEmail} readOnly className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none text-gray-400 cursor-not-allowed" /></div>
               </div>
             </motion.div>
@@ -192,7 +205,7 @@ export default function SettingsPage() {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-dark p-6 rounded-2xl border border-white/5 space-y-4">
               <h3 className="font-serif font-bold">Paiements</h3>
               <div className="grid grid-cols-3 gap-4">
-                {[{ l: 'CA du mois', v: '—' }, { l: 'Rendez-vous', v: '—' }, { l: 'Panier moyen', v: '—' }].map((s, i) => (
+                {[{ l: 'CA du mois', v: `${billing.ca} €` }, { l: 'Rendez-vous', v: billing.count.toString() }, { l: 'Panier moyen', v: `${billing.avg} €` }].map((s, i) => (
                   <div key={i} className="bg-white/5 p-4 rounded-xl text-center"><p className="text-xl font-bold text-[#e76f51] mb-1">{s.v}</p><p className="text-[10px] text-gray-500 uppercase tracking-widest">{s.l}</p></div>
                 ))}
               </div>

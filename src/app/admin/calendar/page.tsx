@@ -10,37 +10,13 @@ import {
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import { Appointment, statusBadge, statusLabel, statusBorder, statusDot } from '@/lib/types'
+import { Appointment, statusBadge, statusLabel, statusBorder } from '@/lib/types'
 
 const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
 const STAFF_NAME = 'Lara Cristina'
 const DEFAULT_DURATION = '60m'
-
-const SERVICE_PRICES: Record<string, number> = {
-  'Tradicional (Mãos)': 25,
-  'Mãos com Semi Permanente': 40,
-  'Pés (spa) com Semi Permanente': 45,
-  'Pés e Mãos com Semi Permanente': 75,
-  'Blindagem': 50,
-  'Banho de gel': 65,
-  'Adicional Esmaltação Semi Permanente': 10,
-  'Manutenção Alongamento de fibra': 65,
-  'Manutenção com esmaltação semi': 75,
-  'Alongamento de fibra': 85,
-  'Alongamento fibra com semi permanente': 95,
-  'Arte Encapsulada (2 unhas)': 10,
-  'Arte Encap. Top Coat (2 unhas)': 5,
-  'Nails arte': 5,
-  'Plástica dos pés': 70,
-  'Plástica dos pés + semi': 75,
-  'Reposição de Unha (2 unhas)': 5,
-  'Remoção de Alongamento': 20,
-  'Francesinha Reversa (2 unhas)': 10,
-  'Baby Boomer': 10,
-  'Película o Par': 3,
-  'Pedraria (2 unhas)': 3,
-}
+const CATEGORIES = ['Tradicional', 'Aplicação', 'Manutenção', 'Alongamento', 'Outros']
 
 export default function CalendarPage() {
   const t = new Date()
@@ -55,7 +31,14 @@ export default function CalendarPage() {
   const [menu, setMenu] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
   const [formPrice, setFormPrice] = useState('0')
+  const [serviceList, setServiceList] = useState<{name: string; price: number; category: string}[]>([])
   const supabase = createClient()
+
+  useEffect(() => {
+    supabase.from('services').select('name,price,category').eq('active', true).order('category').order('name').then(({ data }) => {
+      if (data) setServiceList(data)
+    })
+  }, [supabase])
 
   const daysInMonth = new Date(year, month + 1, 0).getDate()
   const firstDow = (new Date(year, month, 1).getDay() + 6) % 7
@@ -77,6 +60,8 @@ export default function CalendarPage() {
 
   const prevMonth = () => { if (month === 0) { setMonth(11); setYear(y => y - 1) } else setMonth(m => m - 1); setDay(1) }
   const nextMonth = () => { if (month === 11) { setMonth(0); setYear(y => y + 1) } else setMonth(m => m + 1); setDay(1) }
+
+  const getServicePrice = (name: string) => serviceList.find(s => s.name === name)?.price || 0
 
   const openNew = () => { setEditing(null); setFormPrice('0'); setModal(true) }
   const openEdit = (a: Appointment) => { setEditing(a); setFormPrice(String(a.price || 0)); setMenu(null); setModal(true) }
@@ -270,12 +255,16 @@ export default function CalendarPage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Prestation</label>
-                  <select name="service_name" defaultValue={editing?.service_name || 'Mãos com Semi Permanente'} onChange={e => setFormPrice(String(SERVICE_PRICES[e.target.value] || 0))} className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]">
-                    <optgroup label="Tradicional"><option>Tradicional (Mãos)</option><option>Mãos com Semi Permanente</option><option>Pés (spa) com Semi Permanente</option><option>Pés e Mãos com Semi Permanente</option></optgroup>
-                    <optgroup label="Aplicação"><option>Blindagem</option><option>Banho de gel</option><option>Adicional Esmaltação Semi Permanente</option></optgroup>
-                    <optgroup label="Manutenção"><option>Manutenção Alongamento de fibra</option><option>Manutenção com esmaltação semi</option></optgroup>
-                    <optgroup label="Alongamento"><option>Alongamento de fibra</option><option>Alongamento fibra com semi permanente</option><option>Arte Encapsulada (2 unhas)</option><option>Arte Encap. Top Coat (2 unhas)</option><option>Nails arte</option></optgroup>
-                    <optgroup label="Outros"><option>Plástica dos pés</option><option>Plástica dos pés + semi</option><option>Reposição de Unha (2 unhas)</option><option>Remoção de Alongamento</option><option>Francesinha Reversa (2 unhas)</option><option>Baby Boomer</option><option>Película o Par</option><option>Pedraria (2 unhas)</option></optgroup>
+                  <select name="service_name" defaultValue={editing?.service_name || (serviceList[0]?.name || '')} onChange={e => setFormPrice(String(getServicePrice(e.target.value)))} className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]">
+                    {CATEGORIES.map(cat => {
+                      const items = serviceList.filter(s => s.category === cat)
+                      if (!items.length) return null
+                      return (
+                        <optgroup key={cat} label={cat}>
+                          {items.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
+                        </optgroup>
+                      )
+                    })}
                   </select>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
