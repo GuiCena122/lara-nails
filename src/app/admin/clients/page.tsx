@@ -1,471 +1,313 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import {
   Search,
   Plus,
-  MoreHorizontal,
-  Mail,
-  Phone,
   History,
+  TrendingUp,
   Filter,
   X,
-  Trash2,
-  Pencil,
-  Loader2,
-  AlertTriangle,
-  RefreshCw,
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { supabase } from '@/lib/supabase'
-import { toast } from 'sonner'
+  ChevronRight,
+  Loader2
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
+import { ClientProfile } from "@/lib/types";
+import { Typography } from "@/components/ui/Typography";
+import { Button } from "@/components/ui/Button";
 
-interface ClientEntry {
-  id: string // dedup key
-  name: string
-  email: string | null
-  phone: string | null
-  visits: number
-  spent: number
-  lastVisit: string
-  status: string
-}
+export const dynamic = 'force-dynamic';
 
 export default function ClientsPage() {
-  const [clients, setClients] = useState<ClientEntry[]>([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [menuOpen, setMenuOpen] = useState<string | null>(null)
-  const itemsPerPage = 8
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dynamicClients, setDynamicClients] = useState<ClientProfile[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   const fetchClients = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-
-    const { data: appointments, error: fetchError } = await supabase
+    const { data: appointments } = await supabase
       .from('appointments')
-      .select('*')
-      .order('appointment_date', { ascending: false })
-
-    if (fetchError) {
-      setError(fetchError.message)
-      setLoading(false)
-      return
-    }
+      .select('*');
 
     if (appointments) {
-      const map = new Map<string, ClientEntry>()
+      const clientsMap = new Map<string, ClientProfile>();
 
-      appointments.forEach((apt: any) => {
-        const key = apt.client_email || apt.client_phone || apt.client_name || 'inconnu'
-
-        if (!map.has(key)) {
-          map.set(key, {
-            id: key,
-            name: apt.client_name || 'Inconnu',
-            email: apt.client_email || null,
-            phone: apt.client_phone || null,
+      appointments.forEach((apt) => {
+        const email = apt.client_email || apt.client_phone || 'inconnu';
+        if (!clientsMap.has(email)) {
+          clientsMap.set(email, {
+            id: apt.id,
+            name: apt.client_name,
+            email: apt.client_email,
+            phone: apt.client_phone,
             visits: 0,
-            spent: 0,
-            lastVisit: apt.appointment_date || '',
-            status: 'Nouveau',
-          })
+            spentValue: 0,
+            rating: 5.0,
+            status: "Nouveau",
+            spent: "0€"
+          });
         }
 
-        const c = map.get(key)!
-        c.visits += 1
-        c.spent += Number(apt.price || 0)
-        if (apt.appointment_date && apt.appointment_date > c.lastVisit) {
-          c.lastVisit = apt.appointment_date
-        }
+        const client = clientsMap.get(email)!;
+        client.visits += 1;
+        client.spentValue += Number(apt.price || 0);
 
-        if (c.visits >= 10) c.status = 'Vip'
-        else if (c.visits >= 3) c.status = 'Régulier'
-      })
+        if (client.visits >= 10) client.status = "Vip";
+        else if (client.visits >= 3) client.status = "Régulier";
+      });
 
-      setClients(Array.from(map.values()))
+      const formattedClients = Array.from(clientsMap.values()).map(c => ({
+        ...c,
+        spent: `${c.spentValue}€`
+      }));
+
+      setDynamicClients(formattedClients);
     }
-
-    setLoading(false)
-  }, [])
+  }, []);
 
   useEffect(() => {
-    fetchClients()
-  }, [fetchClients])
+    const timer = setTimeout(() => fetchClients(), 0);
+    return () => clearTimeout(timer);
+  }, [fetchClients]);
 
-  // ---- search & pagination ----
-  const filtered = clients.filter(
-    c =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (c.email && c.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (c.phone && c.phone.includes(searchTerm))
-  )
+  const filteredClients = dynamicClients.filter(c =>
+    c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (c.email?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
+    (c.phone?.includes(searchTerm) ?? false)
+  );
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage))
-  const safeCurrentPage = Math.min(currentPage, totalPages)
-  const paginated = filtered.slice(
-    (safeCurrentPage - 1) * itemsPerPage,
-    safeCurrentPage * itemsPerPage
-  )
+  const paginatedClients = filteredClients.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
-  // ---- CRUD ----
   const handleAddClient = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const formData = new FormData(e.target as HTMLFormElement)
+    e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
-    const payload = {
-      client_name: formData.get('name') as string,
-      client_email: (formData.get('email') as string) || null,
-      client_phone: (formData.get('phone') as string) || null,
-      service_name: 'Fiche cliente',
+    const formData = new FormData(e.target as HTMLFormElement);
+
+    const newApt = {
+      client_name: formData.get("name") as string,
+      client_email: formData.get("email") as string,
+      client_phone: formData.get("phone") as string,
+      service_name: "Inscription",
       appointment_date: new Date().toISOString().split('T')[0],
-      appointment_time: '09:00',
+      appointment_time: "00:00",
       price: 0,
-      status: 'confirmed',
-    }
+      status: "confirmed"
+    };
 
-    const { error: insertError } = await supabase.from('appointments').insert([payload])
+    const { error } = await supabase
+      .from('appointments')
+      .insert([newApt]);
 
-    if (insertError) {
-      toast.error('Erreur: ' + insertError.message)
-      return
-    }
-
-    setIsModalOpen(false)
-    toast.success('Cliente ajoutée avec succès !')
-    fetchClients()
-  }
-
-  const handleDeleteClient = async (client: ClientEntry) => {
-    setMenuOpen(null)
-
-    // Delete all appointments for this client (matched by email, phone, or name)
-    let query = supabase.from('appointments').delete()
-
-    if (client.email) {
-      query = query.eq('client_email', client.email)
-    } else if (client.phone) {
-      query = query.eq('client_phone', client.phone)
+    if (error) {
+      toast.error("Erreur registre: " + error.message);
     } else {
-      query = query.eq('client_name', client.name)
+      fetchClients();
+      setIsModalOpen(false);
+      toast.success("Client inscrit au livre d&apos;or.");
     }
+    setIsSubmitting(false);
+  };
 
-    const { error: deleteError } = await query
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+  };
 
-    if (deleteError) {
-      toast.error('Erreur lors de la suppression: ' + deleteError.message)
-      return
-    }
-
-    toast.success('Cliente et tous ses rendez-vous supprimés.')
-    fetchClients()
-  }
-
-  // ---- status ----
-  const statusClass = (s: string) =>
-    s === 'Vip'
-      ? 'bg-[#e76f51]/20 text-[#e76f51]'
-      : s === 'Régulier'
-        ? 'bg-blue-500/10 text-blue-400'
-        : 'bg-green-500/10 text-green-400'
-
-  // ---- error state ----
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center py-32 gap-4">
-        <AlertTriangle className="w-7 h-7 text-rose-400" />
-        <p className="text-gray-400 text-sm">Erreur de connexion</p>
-        <p className="text-gray-600 text-xs">{error}</p>
-        <button
-          onClick={fetchClients}
-          className="flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-gray-300 hover:bg-white/10 transition-all"
-        >
-          <RefreshCw className="w-4 h-4" /> Réessayer
-        </button>
-      </div>
-    )
-  }
+  const rowVariants: Variants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: [0.43, 0.13, 0.23, 0.96] } }
+  };
 
   return (
-    <div className="space-y-8 animate-in fade-in">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="space-y-16 animate-in fade-in duration-1000 pb-20 text-balance bg-brand-ivory min-h-screen">
+      {/* Ledger Header - Light Mode */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b-[0.5px] border-black/10 pb-12">
         <div>
-          <h2 className="text-2xl font-serif font-bold">Gestion des Clientes</h2>
-          <p className="text-gray-500 text-sm font-light">
-            {clients.length} cliente{clients.length !== 1 ? 's' : ''} enregistrée{clients.length !== 1 ? 's' : ''}
-          </p>
+          <Typography variant="label" className="text-brand-gold mb-4 block tracking-[0.4em] font-black uppercase">REGISTRE DES CLIENTES</Typography>
+          <Typography variant="h1" serif className="text-6xl lg:text-8xl tracking-tighter text-brand-black">Le Livre <br /> <span className="gold-text-shine italic">d&apos;Or.</span></Typography>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-[#e76f51] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-[#e76f51]/20 flex items-center gap-2 hover:scale-[1.02] transition-all"
-        >
-          <Plus className="w-4 h-4" /> Ajouter Cliente
-        </button>
+        <div className="flex items-center gap-6">
+           <button onClick={() => toast.info("Statistiques bientôt disponíveis")} className="text-black/20 hover:text-brand-gold transition-colors p-4">
+              <TrendingUp size={24} />
+           </button>
+           <Button variant="luxury" size="default" className="h-14 px-12 border-[0.5px] border-brand-gold/20 group text-white" onClick={() => setIsModalOpen(true)}>
+              <Plus className="w-4 h-4 mr-3" /> <span className="tracking-[0.2em]">INSCRIRE</span>
+           </Button>
+        </div>
       </div>
 
-      {/* Search */}
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1 relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+      {/* Ledger Search Ritual - Light Mode */}
+      <div className="flex flex-col md:flex-row gap-10">
+        <div className="flex-1 relative group">
+          <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-gold/40 group-focus-within:text-brand-gold transition-colors" />
           <input
             type="text"
-            placeholder="Rechercher par nom, email ou téléphone..."
+            placeholder="Parcourir por nom ou e-mail..."
             value={searchTerm}
-            onChange={e => {
-              setSearchTerm(e.target.value)
-              setCurrentPage(1)
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
             }}
-            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm outline-none focus:border-[#e76f51] transition-all"
+            className="w-full bg-transparent border-b-[0.5px] border-black/10 py-5 pl-10 pr-6 text-xl font-serif italic text-brand-black outline-none focus:border-brand-gold transition-all placeholder:text-black/10"
           />
         </div>
-        <button
-          onClick={() => toast.info('Filtres avancés bientôt disponibles')}
-          className="px-6 py-4 bg-white/5 rounded-2xl border border-white/10 flex items-center gap-3 text-sm font-bold hover:bg-white/10 transition-all text-gray-400"
-        >
-          <Filter className="w-4 h-4" /> Filtres
+        <button onClick={() => toast.info("Filtres em breve")} className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-black/30 hover:text-brand-black transition-all">
+          <Filter size={14} /> FILTRER LE REGISTRE
         </button>
       </div>
 
-      {/* Table */}
-      <div className="glass-dark rounded-[2rem] border border-white/5 overflow-hidden">
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
-          </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-white/5 border-b border-white/5">
-                    <th className="px-4 md:px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-500">
-                      Cliente
-                    </th>
-                    <th className="px-4 md:px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-500">
-                      Status
-                    </th>
-                    <th className="px-4 md:px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-500 hidden md:table-cell">
-                      Visites
-                    </th>
-                    <th className="px-4 md:px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-500 hidden md:table-cell">
-                      Dépenses
-                    </th>
-                    <th className="px-4 md:px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-500 hidden md:table-cell">
-                      Dernière visite
-                    </th>
-                    <th className="px-4 md:px-8 py-5 text-right text-[10px] font-bold uppercase tracking-widest text-gray-500">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {paginated.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="text-center py-16 text-gray-500 text-sm">
-                        {searchTerm
-                          ? 'Aucune cliente trouvée pour cette recherche.'
-                          : 'Aucune cliente enregistrée.'}
-                      </td>
-                    </tr>
-                  ) : (
-                    paginated.map((client, i) => (
-                      <motion.tr
-                        key={client.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.03 }}
-                        className="hover:bg-white/[0.02] transition-colors group"
-                      >
-                        <td className="px-4 md:px-8 py-5">
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#e76f51]/20 to-transparent flex items-center justify-center font-bold text-[#e76f51] border border-[#e76f51]/20 shrink-0 text-sm">
-                              {client.name ? client.name[0].toUpperCase() : '?'}
-                            </div>
-                            <div>
-                              <p className="font-bold text-sm mb-0.5 max-w-[140px] md:max-w-none truncate">
-                                {client.name}
-                              </p>
-                              <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 text-[10px] text-gray-500">
-                                {client.email && (
-                                  <span className="flex items-center gap-1">
-                                    <Mail className="w-3 h-3" /> {client.email}
-                                  </span>
-                                )}
-                                {client.phone && (
-                                  <span className="flex items-center gap-1">
-                                    <Phone className="w-3 h-3" /> {client.phone}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 md:px-8 py-5">
-                          <span
-                            className={cn(
-                              'text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest whitespace-nowrap',
-                              statusClass(client.status)
-                            )}
-                          >
-                            {client.status}
-                          </span>
-                        </td>
-                        <td className="px-4 md:px-8 py-5 font-medium text-sm hidden md:table-cell">
-                          {client.visits}
-                        </td>
-                        <td className="px-4 md:px-8 py-5 font-bold text-sm text-[#e76f51] hidden md:table-cell">
-                          {client.spent} €
-                        </td>
-                        <td className="px-4 md:px-8 py-5 text-sm text-gray-400 hidden md:table-cell">
-                          {client.lastVisit || '—'}
-                        </td>
-                        <td className="px-4 md:px-8 py-5 text-right">
-                          <div className="relative flex justify-end">
-                            <button
-                              onClick={() =>
-                                setMenuOpen(menuOpen === client.id ? null : client.id)
-                              }
-                              className="p-2 text-gray-500 hover:text-white hover:bg-white/5 rounded-lg transition-all"
-                            >
-                              <MoreHorizontal className="w-4 h-4" />
-                            </button>
-                            {menuOpen === client.id && (
-                              <div className="absolute right-0 top-10 bg-[#1a1a1a] border border-white/10 rounded-xl p-1 shadow-xl z-20 min-w-[130px]">
-                                <button
-                                  onClick={() => {
-                                    setMenuOpen(null)
-                                    toast.info('Historique détaillé bientôt disponible')
-                                  }}
-                                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-gray-300 hover:bg-white/5 rounded-lg transition-all"
-                                >
-                                  <History className="w-3.5 h-3.5" /> Historique
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteClient(client)}
-                                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-rose-400 hover:bg-rose-400/10 rounded-lg transition-all"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" /> Supprimer
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                      </motion.tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+      {/* The Gold Ledger (Table) - Light Mode */}
+      <div className="bg-white rounded-[4rem] border border-black/5 overflow-hidden shadow-sm relative">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[0.5px] bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent" />
 
-            {/* Pagination */}
-            {filtered.length > itemsPerPage && (
-              <div className="p-6 bg-white/5 border-t border-white/5 flex items-center justify-between">
-                <p className="text-xs text-gray-500">
-                  Affichage de {paginated.length} sur {filtered.length} clientes
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={safeCurrentPage === 1}
-                    className="px-4 py-2 bg-white/5 rounded-lg text-xs font-bold text-gray-400 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Précédent
-                  </button>
-                  <span className="px-3 py-2 text-xs text-gray-500">
-                    {safeCurrentPage} / {totalPages}
-                  </span>
-                  <button
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    disabled={safeCurrentPage === totalPages}
-                    className="px-4 py-2 bg-[#e76f51] rounded-lg text-xs font-bold text-white shadow-lg shadow-[#e76f51]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Suivant
-                  </button>
-                </div>
-              </div>
-            )}
-          </>
-        )}
+        <div className="overflow-x-auto text-balance">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-brand-ivory/30 border-b border-black/5">
+                <th className="px-10 py-8 text-[9px] font-black uppercase tracking-[0.4em] text-brand-gold/60">PRÉFÉRENCES & IDENTITÉ</th>
+                <th className="px-10 py-8 text-[9px] font-black uppercase tracking-[0.4em] text-brand-gold/60 text-center">STATUT</th>
+                <th className="px-10 py-8 text-[9px] font-black uppercase tracking-[0.4em] text-brand-gold/60 text-center hidden md:table-cell">SÉANCES</th>
+                <th className="px-10 py-8 text-[9px] font-black uppercase tracking-[0.4em] text-brand-gold/60 text-right hidden md:table-cell">VALEUR ÉLÉVATION</th>
+                <th className="px-10 py-8 text-right text-[9px] font-black uppercase tracking-[0.4em] text-brand-gold/60">ACTIONS</th>
+              </tr>
+            </thead>
+            <motion.tbody
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="divide-y divide-black/5"
+            >
+              {paginatedClients.map((client) => (
+                <motion.tr
+                  key={client.id}
+                  variants={rowVariants}
+                  className="hover:bg-brand-ivory/50 transition-colors group cursor-default"
+                >
+                  <td className="px-10 py-10">
+                    <div className="flex items-center gap-8">
+                      <div className="w-14 h-14 rounded-full border border-brand-gold/20 flex items-center justify-center font-black text-brand-gold bg-white shadow-sm relative overflow-hidden group-hover:border-brand-gold transition-all duration-700">
+                         <div className="absolute inset-0 bg-gradient-to-br from-brand-gold/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                         <Typography variant="h4" serif className="text-xl relative z-10">{client.name ? client.name[0] : '?'}</Typography>
+                      </div>
+                      <div>
+                        <Typography variant="h4" serif className="text-2xl text-brand-black group-hover:text-brand-gold transition-colors duration-500">{client.name}</Typography>
+                        <Typography variant="label" className="text-[7px] opacity-20 block mt-1 tracking-[0.2em] font-black uppercase">{client.email || "ANONYME"}</Typography>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-10 py-10 text-center">
+                    <span className={cn(
+                      "text-[8px] font-black px-4 py-1 rounded-full uppercase tracking-[0.2em] border shadow-sm",
+                      client.status === "Vip" ? "bg-brand-gold text-white border-brand-gold" : "border-black/10 text-black/40"
+                    )}>
+                      {client.status}
+                    </span>
+                  </td>
+                  <td className="px-10 py-10 text-center hidden md:table-cell">
+                    <Typography variant="span" className="text-lg font-serif italic text-black/60">{client.visits}</Typography>
+                  </td>
+                  <td className="px-10 py-10 text-right hidden md:table-cell">
+                    <Typography variant="h3" serif className="text-brand-gold text-2xl group-hover:scale-110 transition-transform duration-500">{client.spent}</Typography>
+                  </td>
+                  <td className="px-10 py-10 text-right">
+                    <div className="flex justify-end gap-6">
+                      <button className="text-black/10 hover:text-brand-gold transition-all" title="Historique">
+                        <History size={20} strokeWidth={1.5} />
+                      </button>
+                      <button className="text-black/10 hover:text-brand-gold transition-all">
+                        <ChevronRight size={20} strokeWidth={1.5} />
+                      </button>
+                    </div>
+                  </td>
+                </motion.tr>
+              ))}
+            </motion.tbody>
+          </table>
+        </div>
+
+        {/* Ledger Pagination - Light Mode */}
+        <div className="p-10 border-t border-black/5 flex items-center justify-between bg-brand-ivory/10">
+          <Typography variant="label" className="text-[8px] opacity-20 tracking-[0.4em] uppercase font-black">
+            PAGE {currentPage} SUR {Math.ceil(filteredClients.length / itemsPerPage)}
+          </Typography>
+          <div className="flex gap-10">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="text-[9px] font-black uppercase tracking-[0.3em] text-black/20 hover:text-brand-gold disabled:opacity-0 transition-all"
+            >
+              PRÉCÉDENT
+            </button>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(Math.ceil(filteredClients.length / itemsPerPage), p + 1))}
+              disabled={currentPage >= Math.ceil(filteredClients.length / itemsPerPage) || filteredClients.length === 0}
+              className="text-[9px] font-black uppercase tracking-[0.3em] text-black/20 hover:text-brand-gold disabled:opacity-0 transition-all"
+            >
+              SUIVANT
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Add Client Modal */}
+      {/* Gold Register Modal - Light Mode */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 text-balance">
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-white/80 backdrop-blur-md"
               onClick={() => setIsModalOpen(false)}
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-md glass-dark border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl"
+              exit={{ opacity: 0, scale: 0.95, y: 30 }}
+              transition={{ duration: 0.8, ease: [0.43, 0.13, 0.23, 0.96] }}
+              className="relative w-full max-w-xl bg-white border border-brand-gold/20 rounded-[4rem] p-12 md:p-16 shadow-luxury overflow-hidden text-balance"
             >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-serif font-bold">Nouvelle Cliente</h3>
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
-                >
-                  <X className="w-4 h-4" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-bl-full pointer-events-none text-balance" />
+
+              <div className="flex items-center justify-between mb-16 relative z-10 text-balance">
+                <div>
+                   <Typography variant="h3" serif className="text-brand-black mb-2 text-balance">Inscription au Livre</Typography>
+                   <Typography variant="label" className="text-brand-gold tracking-[0.3em] text-balance font-black">NOUVEAU PROFIL CLIENTE</Typography>
+                </div>
+                <button onClick={() => setIsModalOpen(false)} className="p-3 bg-black/5 rounded-full hover:bg-white/10 transition-colors text-brand-gold">
+                  <X size={20} />
                 </button>
               </div>
 
-              <form onSubmit={handleAddClient} className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                    Nom Complet
-                  </label>
-                  <input
-                    required
-                    name="name"
-                    type="text"
-                    placeholder="Ex: Clara Dupont"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51] transition-all"
-                  />
+              <form onSubmit={handleAddClient} className="space-y-12 relative z-10 text-balance">
+                <div className="space-y-4 text-balance">
+                  <Typography variant="label" className="px-2 font-black uppercase text-balance">NOM ET PRÉNOM</Typography>
+                  <input required name="name" type="text" className="w-full bg-transparent border-b-[0.5px] border-black/10 p-4 text-2xl font-serif italic outline-none focus:border-brand-gold transition-all text-brand-black" />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                    Email
-                  </label>
-                  <input
-                    name="email"
-                    type="email"
-                    placeholder="clara@example.com"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51] transition-all"
-                  />
+                <div className="space-y-4 text-balance">
+                  <Typography variant="label" className="px-2 font-black uppercase text-balance">COORDONNÉES (E-MAIL)</Typography>
+                  <input name="email" type="email" className="w-full bg-transparent border-b-[0.5px] border-black/10 p-4 text-xl font-serif italic outline-none focus:border-brand-gold transition-all text-brand-black" />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                    Téléphone
-                  </label>
-                  <input
-                    name="phone"
-                    type="tel"
-                    placeholder="+33 6 00 00 00 00"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51] transition-all"
-                  />
+                <div className="space-y-4 text-balance">
+                  <Typography variant="label" className="px-2 font-black uppercase text-balance">TÉLÉPHONE MOBILE</Typography>
+                  <input required name="phone" type="tel" className="w-full bg-transparent border-b-[0.5px] border-black/10 p-4 text-xl font-serif italic outline-none focus:border-brand-gold transition-all text-brand-black" />
                 </div>
-                <button
-                  type="submit"
-                  className="w-full py-4 mt-4 bg-[#e76f51] text-white rounded-xl font-bold shadow-lg shadow-[#e76f51]/20 hover:scale-[1.02] transition-transform"
-                >
-                  Enregistrer
-                </button>
+                <Button disabled={isSubmitting} type="submit" variant="luxury" size="lg" className="w-full h-20 group border-[0.5px] border-brand-gold/20 mt-8 text-white">
+                   {isSubmitting ? <Loader2 className="animate-spin" /> : <><span className="relative z-10 tracking-[0.3em]">SCELLER LE PROFIL</span><div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" /></>}
+                </Button>
               </form>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
     </div>
-  )
+  );
 }

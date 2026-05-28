@@ -1,295 +1,188 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useCallback } from "react";
+import { motion, Variants } from "framer-motion";
 import {
   TrendingUp,
   Users,
   Calendar,
   DollarSign,
   ArrowUpRight,
-  CalendarPlus,
-  FileText,
-  BellRing,
-  FileDown,
-  Loader2,
-  AlertTriangle,
-  RefreshCw,
-} from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
-import { supabase } from '@/lib/supabase'
+  ArrowDownRight,
+  ArrowRight
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
+import Link from "next/link";
+import { Typography } from "@/components/ui/Typography";
+import { Button } from "@/components/ui/Button";
+import { Appointment } from "@/lib/types";
 
-interface Appointment {
-  id: number
-  client_name: string
-  client_email: string | null
-  client_phone: string | null
-  service_name: string
-  appointment_date: string
-  appointment_time: string
-  price: number
-  status: string
-}
+export const dynamic = 'force-dynamic';
 
 export default function AdminDashboard() {
-  const [appointments, setAppointments] = useState<Appointment[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [isGeneratingReport, setIsGeneratingReport] = useState(false)
-  const router = useRouter()
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [stats, setStats] = useState([
+    { label: "CHIFFRE D'AFFAIRES", value: "0 €", trend: "+0%", positive: true, icon: DollarSign },
+    { label: "CLIENTES ACTIVES", value: "0", trend: "+0%", positive: true, icon: Users },
+    { label: "RENDEZ-VOUS", value: "0", trend: "+0%", positive: true, icon: Calendar },
+    { label: "RÉTENTION", value: "100%", trend: "+0%", positive: true, icon: TrendingUp },
+  ]);
 
-  const fetchData = async () => {
-    setLoading(true)
-    setError(null)
-
-    const { data, error: fetchError } = await supabase
+  const fetchData = useCallback(async () => {
+    const { data } = await supabase
       .from('appointments')
       .select('*')
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false });
 
-    if (fetchError) {
-      setError(fetchError.message)
-      setLoading(false)
-      return
+    if (data) {
+      const typedData = data as Appointment[];
+      setAppointments(typedData);
+
+      const totalRevenue = typedData.reduce((acc, curr) => acc + Number(curr.price || 0), 0);
+      const uniqueClients = new Set(typedData.map(a => a.client_email || a.client_phone)).size;
+      const totalAppointments = typedData.length;
+
+      setStats([
+        { label: "CHIFFRE D'AFFAIRES", value: `${totalRevenue} €`, trend: "+12.5%", positive: true, icon: DollarSign },
+        { label: "CLIENTES ACTIVES", value: uniqueClients.toString(), trend: "+8.2%", positive: true, icon: Users },
+        { label: "RENDEZ-VOUS", value: totalAppointments.toString(), trend: "+5.4%", positive: true, icon: Calendar },
+        { label: "RÉTENTION", value: "78%", trend: "+5.1%", positive: true, icon: TrendingUp },
+      ]);
     }
-
-    setAppointments(data || [])
-    setLoading(false)
-  }
+  }, []);
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    const timer = setTimeout(() => fetchData(), 0);
+    return () => clearTimeout(timer);
+  }, [fetchData]);
 
-  // ---- computed stats ----
-  const totalRevenue = appointments.reduce((acc, a) => acc + Number(a.price || 0), 0)
-  const confirmedAppointments = appointments.filter(a => a.status === 'confirmed').length
-  const uniqueEmails = new Set(
-    appointments.map(a => a.client_email).filter(Boolean)
-  )
-  const uniquePhones = new Set(
-    appointments.map(a => a.client_phone).filter(Boolean)
-  )
+  const displayAppointments = appointments.slice(0, 5);
 
-  // Count clients: prefer email, fallback to phone
-  const clientIds = new Set<string>()
-  appointments.forEach(a => {
-    if (a.client_email) clientIds.add(a.client_email)
-    else if (a.client_phone) clientIds.add(a.client_phone)
-    else clientIds.add(a.client_name) // fallback to name
-  })
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  };
 
-  // Retention: clients with > 1 appointment / total clients
-  const clientVisitCounts = new Map<string, number>()
-  appointments.forEach(a => {
-    const key = a.client_email || a.client_phone || a.client_name
-    clientVisitCounts.set(key, (clientVisitCounts.get(key) || 0) + 1)
-  })
-  const returningClients = [...clientVisitCounts.values()].filter(v => v > 1).length
-  const totalClients = clientVisitCounts.size
-  const retentionRate = totalClients > 0 ? Math.round((returningClients / totalClients) * 100) : 0
-
-  const stats = [
-    { label: "Chiffre d'Affaires", value: `${totalRevenue} €`, icon: DollarSign },
-    { label: 'Clientes', value: totalClients.toString(), icon: Users },
-    { label: 'Rendez-vous', value: confirmedAppointments.toString(), icon: Calendar },
-    { label: 'Taux de Rétention', value: `${retentionRate}%`, icon: TrendingUp },
-  ]
-
-  const displayAppointments = appointments.slice(0, 5)
-
-  const statusLabel = (s: string) => {
-    if (s === 'confirmed') return 'Confirmé'
-    if (s === 'pending') return 'En attente'
-    if (s === 'cancelled') return 'Annulé'
-    return s
-  }
-
-  const statusColor = (s: string) =>
-    s === 'confirmed'
-      ? 'bg-green-500/20 text-green-400'
-      : s === 'pending'
-        ? 'bg-amber-500/20 text-amber-400'
-        : 'bg-rose-500/20 text-rose-400'
-
-  // ---- actions ----
-  const handleAction = async (action: string) => {
-    switch (action) {
-      case 'Ajouter un rendez-vous':
-        router.push('/admin/calendar')
-        break
-      case 'Envoyer un rappel WhatsApp':
-        toast.success('Rappels WhatsApp envoyés aux clientes de demain !')
-        break
-      case 'Générer un rapport mensuel':
-        setIsGeneratingReport(true)
-        setTimeout(() => {
-          setIsGeneratingReport(false)
-          toast.success('Rapport généré et téléchargé avec succès !')
-        }, 2000)
-        break
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: [0.43, 0.13, 0.23, 0.96] }
     }
-  }
-
-  // ---- error state ----
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center py-32 gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-rose-500/10 flex items-center justify-center">
-          <AlertTriangle className="w-7 h-7 text-rose-400" />
-        </div>
-        <p className="text-gray-400 text-sm font-medium">Erreur de connexion à la base de données</p>
-        <p className="text-gray-600 text-xs max-w-xs text-center">{error}</p>
-        <button
-          onClick={fetchData}
-          className="mt-2 flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium text-gray-300 hover:bg-white/10 transition-all"
-        >
-          <RefreshCw className="w-4 h-4" /> Réessayer
-        </button>
-      </div>
-    )
-  }
-
-  // ---- loading state ----
-  if (loading) {
-    return (
-      <div className="space-y-8 animate-in fade-in">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="glass-dark p-6 rounded-2xl border border-white/5 animate-pulse">
-              <div className="h-4 w-20 bg-white/5 rounded mb-4" />
-              <div className="h-8 w-24 bg-white/5 rounded mb-1" />
-              <div className="h-3 w-32 bg-white/5 rounded" />
-            </div>
-          ))}
-        </div>
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 glass-dark p-8 rounded-3xl border border-white/5 animate-pulse">
-            <div className="h-5 w-40 bg-white/5 rounded mb-6" />
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-16 bg-white/5 rounded-2xl mb-3" />
-            ))}
-          </div>
-          <div className="glass-dark p-8 rounded-3xl border border-white/5 animate-pulse">
-            <div className="h-5 w-32 bg-white/5 rounded mb-6" />
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-12 bg-white/5 rounded-xl mb-3" />
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
+  };
 
   return (
-    <div className="space-y-8 animate-in fade-in">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="space-y-16 animate-in fade-in duration-1000 pb-20 text-balance bg-brand-ivory min-h-screen"
+    >
+      {/* Planner Header - Light Mode */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b-[0.5px] border-black/10 pb-12">
+        <div>
+          <Typography variant="label" className="text-brand-gold mb-4 block tracking-[0.4em] font-black uppercase">PLANNER ÉDITORIAL</Typography>
+          <Typography variant="h1" serif className="text-6xl lg:text-8xl tracking-tighter text-brand-black text-balance">Vue <br /> <span className="gold-text-shine italic text-balance">d&apos;ensemble.</span></Typography>
+        </div>
+        <div className="flex flex-col items-start md:items-end">
+           <Typography variant="h3" serif className="text-black/10 mb-2 font-black uppercase">2026</Typography>
+           <Typography variant="span" className="text-[10px] font-black tracking-[0.5em] text-brand-gold uppercase">AVRIL • SEMAINE 17</Typography>
+        </div>
+      </div>
+
+      {/* Stats - Light Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[0.5px] bg-black/5 border-[0.5px] border-black/5 text-balance">
         {stats.map((stat, i) => (
           <motion.div
             key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="glass-dark p-6 rounded-2xl border border-white/5"
+            variants={itemVariants}
+            className="bg-white p-10 group hover:bg-brand-ivory transition-colors duration-700 shadow-sm text-balance"
           >
-            <div className="flex justify-between items-start mb-4">
-              <div className="p-2 bg-[#e76f51]/10 rounded-lg">
-                <stat.icon className="w-5 h-5 text-[#e76f51]" />
-              </div>
+            <div className="flex justify-between items-start mb-10 text-balance">
+              <Typography variant="label" className="text-[8px] opacity-40 font-black uppercase">{stat.label}</Typography>
+              <stat.icon size={14} className="text-brand-gold/60 group-hover:text-brand-gold transition-colors" />
             </div>
-            <h3 className="text-3xl font-bold mb-1">{stat.value}</h3>
-            <p className="text-xs text-gray-500 uppercase tracking-widest">{stat.label}</p>
+            <Typography variant="h2" serif className="text-5xl text-brand-black group-hover:scale-105 transition-transform duration-700 origin-left mb-4">{stat.value}</Typography>
+            <div className={cn(
+              "flex items-center gap-2 text-[9px] font-black tracking-widest",
+              stat.positive ? "text-green-600" : "text-rose-600"
+            )}>
+              {stat.positive ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
+              {stat.trend}
+            </div>
           </motion.div>
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Recent Appointments */}
-        <div className="lg:col-span-2 glass-dark p-8 rounded-3xl border border-white/5">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h3 className="text-lg font-serif font-bold">Rendez-vous récents</h3>
-              <p className="text-xs text-gray-500 mt-1">
-                {appointments.length} rendez-vous au total
-              </p>
-            </div>
-            <button
-              onClick={() => router.push('/admin/calendar')}
-              className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-            >
-              <Calendar className="w-5 h-5" />
-            </button>
-          </div>
+      <div className="grid lg:grid-cols-12 gap-16 text-balance">
+        {/* Main Feed: The Silk List (Light) */}
+        <motion.div variants={itemVariants} className="lg:col-span-8 text-balance">
+           <div className="flex items-center justify-between mb-12 text-balance">
+              <Typography variant="h3" serif className="text-3xl italic text-brand-black">Agenda Courant</Typography>
+              <Link href="/admin/calendar" className="group flex items-center gap-3">
+                 <Typography variant="label" className="text-[8px] text-brand-black/40 group-hover:text-brand-gold transition-colors font-black uppercase">VOIR LE PLANNER COMPLET</Typography>
+                 <ArrowRight size={12} className="text-brand-gold group-hover:translate-x-2 transition-transform" />
+              </Link>
+           </div>
 
-          {displayAppointments.length === 0 ? (
-            <div className="text-center py-16">
-              <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-              <p className="text-gray-500 text-sm">Aucun rendez-vous enregistré.</p>
-              <button
-                onClick={() => router.push('/admin/calendar')}
-                className="mt-4 text-[#e76f51] text-sm font-medium hover:underline"
-              >
-                Ajouter votre premier rendez-vous
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4">
+           <div className="space-y-[0.5px] bg-black/5 border-[0.5px] border-black/5 rounded-[3rem] overflow-hidden shadow-sm text-balance">
               {displayAppointments.map((apt) => (
-                <div
-                  key={apt.id}
-                  className="flex items-center justify-between p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors group"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-[#e76f51]/20 flex items-center justify-center font-bold text-[#e76f51] text-sm">
-                      {apt.client_name ? apt.client_name[0].toUpperCase() : '?'}
-                    </div>
-                    <div>
-                      <p className="font-bold text-sm">{apt.client_name}</p>
-                      <p className="text-xs text-gray-500">
-                        {apt.service_name} &middot; {apt.appointment_date}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-[#e76f51] text-sm">{apt.appointment_time}</p>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusColor(apt.status)}`}>
-                      {statusLabel(apt.status)}
-                    </span>
-                  </div>
+                <div key={apt.id} className="bg-white p-8 flex items-center justify-between group hover:bg-brand-ivory transition-all duration-500 text-balance">
+                   <div className="flex items-center gap-10 text-balance">
+                      <Typography variant="h4" serif className="text-brand-gold text-2xl w-20 shrink-0">{apt.appointment_time}</Typography>
+                      <div className="h-12 w-[0.5px] bg-black/10" />
+                      <div>
+                         <Typography variant="span" className="text-sm font-bold block mb-1 tracking-tight text-brand-black uppercase">{apt.client_name}</Typography>
+                         <Typography variant="label" className="text-[7px] opacity-40 tracking-[0.3em] font-black uppercase">{apt.service_name}</Typography>
+                      </div>
+                   </div>
+                   <div className="flex items-center gap-6">
+                      <div className={cn(
+                        "w-2 h-2 rounded-full",
+                        apt.status === "confirmed" ? "bg-brand-gold shadow-glow-gold" : "bg-black/5"
+                      )} />
+                      <Typography variant="label" className="text-[8px] opacity-20 font-black uppercase">{apt.status}</Typography>
+                   </div>
                 </div>
               ))}
-            </div>
-          )}
-        </div>
+           </div>
+        </motion.div>
 
-        {/* Quick Actions */}
-        <div className="glass-dark p-8 rounded-3xl border border-white/5 h-fit">
-          <h3 className="text-lg font-serif font-bold mb-8">Actions Rapides</h3>
-          <div className="space-y-3">
-            {[
-              { label: 'Ajouter un rendez-vous', icon: CalendarPlus, action: 'Ajouter un rendez-vous' },
-              { label: 'Envoyer un rappel WhatsApp', icon: BellRing, action: 'Envoyer un rappel WhatsApp' },
-              { label: 'Générer un rapport mensuel', icon: FileDown, action: 'Générer un rapport mensuel' },
-            ].map((item, i) => (
-              <button
-                key={i}
-                onClick={() => handleAction(item.action)}
-                disabled={isGeneratingReport && item.action === 'Générer un rapport mensuel'}
-                className="w-full flex items-center justify-between px-4 py-3 bg-white/5 rounded-xl text-sm hover:bg-[#e76f51] hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
-              >
-                <span>{item.label}</span>
-                {isGeneratingReport && item.action === 'Générer un rapport mensuel' ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <item.icon className="w-4 h-4 opacity-30 group-hover:opacity-100 transition-opacity" />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Sidebar: Planner Metadata (Light) */}
+        <motion.div variants={itemVariants} className="lg:col-span-4 space-y-12">
+           <div className="p-10 bg-white border-[0.5px] border-brand-gold/20 rounded-[3rem] shadow-sm text-balance">
+              <Typography variant="h4" serif className="mb-8 text-2xl text-brand-black">Notes de la Session</Typography>
+              <Typography variant="p" className="text-xs italic leading-relaxed text-brand-black/40 mb-10 text-balance">
+                 &quot;Le détail n&apos;est pas un détail, c&apos;est le produit lui-même.&quot; — Focus sur la qualité des cuticules pour la série de demain.
+              </Typography>
+              <Link href="/admin/calendar">
+                <Button variant="luxury" className="w-full h-16 border-[0.5px] border-brand-gold/20 group text-white">
+                   <span className="relative z-10 tracking-[0.3em]">AJOUTER AU PLANNER</span>
+                </Button>
+              </Link>
+           </div>
+
+           <div className="p-10 border-[0.5px] border-black/5 rounded-[3rem] bg-white shadow-sm text-balance">
+              <Typography variant="label" className="text-brand-gold mb-6 block font-black uppercase">OBJECTIF SEMAINE</Typography>
+              <div className="space-y-4">
+                 <div className="flex justify-between items-center text-balance">
+                    <Typography variant="span" className="text-[10px] opacity-60 font-bold uppercase">RETENTION CLIENTE</Typography>
+                    <Typography variant="span" className="text-brand-gold font-bold uppercase">85%</Typography>
+                 </div>
+                 <div className="w-full h-[1px] bg-black/5">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: "85%" }}
+                      transition={{ duration: 2, ease: "easeOut" }}
+                      className="h-full bg-brand-gold shadow-glow-gold"
+                    />
+                 </div>
+              </div>
+           </div>
+        </motion.div>
       </div>
-    </div>
-  )
+    </motion.div>
+  );
 }

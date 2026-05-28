@@ -1,94 +1,85 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-sans);
-  --font-serif: var(--font-serif);
-  
-  --color-primary: #e76f51;
-  --color-accent: #f4a261;
-  --color-bg-boutique: #FDFBF9;
-  --color-text-charcoal: #1a1a1a;
-  --color-nude-50: #fefae0;
+  --font-sans: "Inter", var(--font-sans);
+  --font-serif: "Playfair Display", var(--font-serif);
+
+  --color-brand-black: #0B0B0B;
+  --color-brand-gold: #C9A66B;
+  --color-brand-gold-light: #EAD0A8;
+  --color-brand-ivory: #F7F3EE;
+  --color-brand-alabaster: #FFFFFF;
+
+  /* Custom Luxury Bezier */
+  --ease-luxury: cubic-bezier(0.43, 0.13, 0.23, 0.96);
+
+  --shadow-glow-gold: 0 0 20px rgba(201, 166, 107, 0.15);
+  --shadow-luxury: 0 20px 50px -12px rgba(201, 166, 107, 0.1);
 }
 
 :root {
-  --background: #FDFBF9;
-  --foreground: #1a1a1a;
+  --background: #F7F3EE;
+  --foreground: #0B0B0B;
 }
 
 @layer base {
   body {
     background-color: var(--background);
     color: var(--foreground);
-    @apply antialiased;
+    @apply antialiased overflow-x-hidden;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+
+    /* The Alabaster Texture (Cotton Paper Depth) */
+    background-image:
+      radial-gradient(circle at 50% -20%, #FFFFFF 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-attachment: fixed;
+    background-blend-mode: overlay;
+    opacity: 0.99;
   }
 
-  ::selection {
-    background-color: #e76f51;
-    color: white;
+  /* Custom Cursor Hide */
+  .custom-cursor-none {
+    cursor: none;
+  }
+
+  /* Luxury Scrollbar (Gold on Alabaster) */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-brand-ivory);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, transparent, var(--color-brand-gold), transparent);
+    border-radius: 10px;
   }
 }
 
 @layer components {
-  .btn-primary {
-    @apply bg-primary text-white font-bold text-sm px-8 py-4 rounded-full transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/20 active:scale-[0.98];
+  .glass-luxury {
+    @apply bg-white/40 backdrop-blur-3xl border border-brand-gold/10 shadow-luxury;
+    border-width: 0.5px;
   }
 
-  .btn-outline {
-    @apply border border-text-charcoal/10 text-text-charcoal/70 font-semibold text-sm px-8 py-4 rounded-full transition-all duration-300 hover:border-text-charcoal/30 hover:text-text-charcoal hover:bg-text-charcoal/5;
+  .brushed-gold-border {
+    position: relative;
+    border: 0.5px solid transparent;
+    background: linear-gradient(var(--background), var(--background)) padding-box,
+                linear-gradient(135deg, #C9A66B 0%, #EAD0A8 50%, #C9A66B 100%) border-box;
   }
 
-  .section-padding {
-    @apply py-20 md:py-32 px-6 md:px-12;
-  }
-
-  .card-luxury {
-    @apply bg-white border border-black/[0.03] shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[2rem] p-8 transition-all duration-500 hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] hover:-translate-y-1;
-  }
-
-  .glass-dark {
-    @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] shadow-[0_8px_32px_rgba(0,0,0,0.12)];
-  }
-
-  .gradient-text {
-    @apply bg-gradient-to-r from-[#e76f51] to-[#f4a261] bg-clip-text text-transparent;
-  }
-
-  .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom, 0.5rem);
-  }
-
-  .animate-in {
-    animation: animateIn 0.5s ease-out forwards;
-  }
-
-  .fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
+  .gold-text-shine {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-gold via-[#D4B98B] to-brand-gold;
+    background-size: 200% auto;
+    animation: shine 6s linear infinite;
   }
 }
 
-@keyframes animateIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes shine {
+  to { background-position: 200% center; }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+.mix-difference {
+  mix-blend-mode: multiply; /* Adjusted for light mode */
 }

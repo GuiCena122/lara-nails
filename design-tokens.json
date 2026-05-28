@@ -1,0 +1,44 @@
+{
+  "color": {
+    "brand": {
+      "black": { "value": "#0B0B0B", "type": "color", "description": "Preto profundo para fundos e contrastes de luxo" },
+      "gold": { "value": "#C9A66B", "type": "color", "description": "Dourado metálico para acentos e botões primários" },
+      "ivory": { "value": "#F7F3EE", "type": "color", "description": "Marfim suave para textos secundários e áreas claras" },
+      "powder": { "value": "#E8CFC7", "type": "color", "description": "Rosa pó para elementos femininos e estados de hover" }
+    },
+    "neutral": {
+      "white": { "value": "#FFFFFF", "type": "color" },
+      "gray": {
+        "100": { "value": "#F5F5F5", "type": "color" },
+        "900": { "value": "#1A1A1A", "type": "color" }
+      }
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "heading": { "value": "Playfair Display, serif", "type": "fontFamily" },
+      "body": { "value": "Inter, sans-serif", "type": "fontFamily" }
+    },
+    "fontSize": {
+      "xs": { "value": "0.75rem", "type": "fontSize" },
+      "sm": { "value": "0.875rem", "type": "fontSize" },
+      "base": { "value": "1rem", "type": "fontSize" },
+      "lg": { "value": "1.125rem", "type": "fontSize" },
+      "xl": { "value": "1.25rem", "type": "fontSize" },
+      "2xl": { "value": "1.5rem", "type": "fontSize" },
+      "5xl": { "value": "3rem", "type": "fontSize" },
+      "9xl": { "value": "8rem", "type": "fontSize" }
+    }
+  },
+  "shadow": {
+    "luxury": { "value": "0 20px 50px -12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(201, 166, 107, 0.1)", "type": "shadow" }
+  },
+  "animation": {
+    "subtle": { "value": "180ms ease-in-out", "type": "duration" },
+    "slow": { "value": "700ms cubic-bezier(0.16, 1, 0.3, 1)", "type": "duration" }
+  },
+  "effects": {
+    "glow": { "value": "rgba(201, 166, 107, 0.15)", "type": "color" },
+    "shine": { "value": "linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent)", "type": "gradient" }
+  }
+}
