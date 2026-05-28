@@ -112,11 +112,11 @@ export default function Navbar() {
               <div className="mt-20 lg:mt-32 flex gap-12">
                  <div className="space-y-2">
                     <Typography variant="label" className="text-brand-gold font-black tracking-widest">INSTAGRAM</Typography>
-                    <Typography variant="span" className="block text-brand-black/40 font-bold">@lara.nails.pro</Typography>
+                    <Typography variant="span" className="block text-brand-black/40 font-bold">@LARACRISTINA_KJV</Typography>
                  </div>
                  <div className="space-y-2">
                     <Typography variant="label" className="text-brand-gold font-black tracking-widest">STUDIO</Typography>
-                    <Typography variant="span" className="block text-brand-black/40 font-bold">Paris, 8ème</Typography>
+                    <Typography variant="span" className="block text-brand-black/40 font-bold">Villiers-sur-Marne 94350</Typography>
                  </div>
               </div>
             </div>

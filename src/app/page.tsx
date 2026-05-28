@@ -22,34 +22,34 @@ export default function Home() {
 
   const services = [
     {
-      title: "Manucure Russe Signature",
-      price: "50 €",
+      title: "Mãos com Semi Permanente",
+      price: "40 €",
       duration: "60",
-      description: "La perfection clinique pour vos cuticules. Une base saine pour une beauté durable.",
+      description: "Esmaltação semi permanente com acabamento impecável e alta durabilidade.",
       image: "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=800",
       macro: "https://images.unsplash.com/photo-1620002131971-ce4a9c68fc0e?q=80&w=1200",
     },
     {
-      title: "Gainage & Semi-Permanent",
+      title: "Banho de Gel",
       price: "65 €",
       duration: "90",
-      description: "Renforcement naturel de l'ongle avec une finition haute brillance.",
+      description: "Aplicação de gel para fortalecimento e beleza natural das unhas.",
       image: "https://images.unsplash.com/photo-1519014816548-bf5fe059e98b?q=80&w=800",
       macro: "https://images.unsplash.com/photo-1599839619722-39751411ea63?q=80&w=1200",
     },
     {
-      title: "Extension Gel Prestige",
+      title: "Alongamento de Fibra",
       price: "85 €",
       duration: "120",
-      description: "Allongement sur-mesure sculpté pour une élégance naturelle et résistante.",
+      description: "Alargamento com fibra de vidro para unhas resistentes e elegantes.",
       image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=800",
       macro: "https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=1200",
     },
     {
-      title: "Nail Art d'Auteur",
-      price: "Dès 15 €",
+      title: "Nail Art & Decoração",
+      price: "Dès 5 €",
       duration: "30",
-      description: "Chaque ongle devient une toile. Minimalisme ou extravagance maîtrisée.",
+      description: "Baby Boomer, Francesinha Reversa, Pedraria, Arte Encapsulada e mais.",
       image: "https://images.unsplash.com/photo-1516975080661-460d3c01c0f9?q=80&w=800",
       macro: "https://images.unsplash.com/photo-1599839619722-39751411ea63?q=80&w=1200",
     },
@@ -243,7 +243,7 @@ export default function Home() {
                 </div>
                 <div>
                    <Typography variant="label" className="text-[7px] tracking-widest opacity-40 font-black">LOCALISATION</Typography>
-                   <Typography variant="span" className="block text-sm font-bold mt-1 text-brand-black uppercase">12 Avenue de l&apos;Élégance, 75008 Paris</Typography>
+                   <Typography variant="span" className="block text-sm font-bold mt-1 text-brand-black uppercase">05 Route de Combault, 94350 Villiers-sur-Marne</Typography>
                 </div>
              </div>
              <div className="flex items-center gap-6 p-8 bg-white border border-black/5 rounded-[2.5rem] shadow-sm group hover:border-brand-gold/20 transition-all">
@@ -252,8 +252,24 @@ export default function Home() {
                 </div>
                 <div>
                    <Typography variant="label" className="text-[7px] tracking-widest opacity-40 font-black">INSTAGRAM</Typography>
-                   <Typography variant="span" className="block text-sm font-bold mt-1 text-brand-black uppercase">@lara.nails.pro</Typography>
+                   <Typography variant="span" className="block text-sm font-bold mt-1 text-brand-black uppercase">@LARACRISTINA_KJV</Typography>
                 </div>
+             </div>
+          </div>
+
+          {/* Règles et Paiements */}
+          <div className="mt-16 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+             <div className="p-8 bg-amber-50/50 border border-amber-100 rounded-[2.5rem] text-center">
+                <Typography variant="label" className="text-amber-700 tracking-[0.2em] font-black uppercase text-[10px] mb-3">Règles du Studio</Typography>
+                <Typography variant="p" className="text-sm text-amber-800/70 leading-relaxed italic">
+                  Atendimento somente com hora marcada. Tolerância de atraso de 20 minutos.
+                </Typography>
+             </div>
+             <div className="p-8 bg-brand-ivory border border-black/5 rounded-[2.5rem] text-center">
+                <Typography variant="label" className="text-brand-gold tracking-[0.2em] font-black uppercase text-[10px] mb-3">Paiements Acceptés</Typography>
+                <Typography variant="p" className="text-sm text-brand-black/50 leading-relaxed">
+                  Dinheiro &middot; Cartão &middot; Transferência Bancária
+                </Typography>
              </div>
           </div>
         </div>
@@ -288,7 +304,7 @@ export default function Home() {
                  <button className="w-12 h-12 rounded-2xl bg-white border border-brand-gold/20 flex items-center justify-center text-brand-gold hover:bg-brand-gold hover:text-white transition-all group shadow-sm">
                     <Camera size={20} className="group-hover:scale-110 transition-transform" />
                  </button>
-                 <Typography variant="span" className="text-[10px] font-black uppercase tracking-widest text-black/30 text-balance">@lara.nails.pro</Typography>
+                 <Typography variant="span" className="text-[10px] font-black uppercase tracking-widest text-black/30 text-balance">@LARACRISTINA_KJV</Typography>
               </div>
             </div>
           </div>

@@ -29,8 +29,8 @@ const tabs = [
 export default function SettingsPage() {
   const [tab, setTab] = useState('salon')
   const [name, setName] = useState('Lara Nails')
-  const [phone, setPhone] = useState('+33 6 12 34 56 78')
-  const [addr, setAddr] = useState("12 Avenue de l'Élégance, Paris")
+  const [phone, setPhone] = useState('+33 07 58 78 07 74')
+  const [addr, setAddr] = useState('05 Route de Combault, 94350 Villiers-sur-Marne')
   const [sched, setSched] = useState<DayS[]>(DEFAULT)
   const [saving, setSaving] = useState(false)
 

@@ -251,8 +251,12 @@ export default function CalendarPage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Prestation</label>
-                  <select name="service_name" defaultValue={editing?.service_name || 'Manucure Russe'} className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]">
-                    <option>Manucure Russe</option><option>Gainage & Semi-Permanent</option><option>Extensions Gel</option><option>Nail Art</option>
+                  <select name="service_name" defaultValue={editing?.service_name || 'Mãos com Semi Permanente'} className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]">
+                    <optgroup label="Tradicional"><option>Tradicional (Mãos)</option><option>Mãos com Semi Permanente</option><option>Pés (spa) com Semi Permanente</option><option>Pés e Mãos com Semi Permanente</option></optgroup>
+                    <optgroup label="Aplicação"><option>Blindagem</option><option>Banho de gel</option><option>Adicional Esmaltação Semi Permanente</option></optgroup>
+                    <optgroup label="Manutenção"><option>Manutenção Alongamento de fibra</option><option>Manutenção com esmaltação semi</option></optgroup>
+                    <optgroup label="Alongamento"><option>Alongamento de fibra</option><option>Alongamento fibra com semi permanente</option><option>Arte Encapsulada (2 unhas)</option><option>Arte Encap. Top Coat (2 unhas)</option><option>Nails arte</option></optgroup>
+                    <optgroup label="Outros"><option>Plástica dos pés</option><option>Plástica dos pés + semi</option><option>Reposição de Unha (2 unhas)</option><option>Remoção de Alongamento</option><option>Francesinha Reversa (2 unhas)</option><option>Baby Boomer</option><option>Película o Par</option><option>Pedraria (2 unhas)</option></optgroup>
                   </select>
                 </div>
                 <div className="grid grid-cols-3 gap-4">

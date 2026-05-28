@@ -14,8 +14,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Lara Nails | Haute Couture Digitale",
-  description: "L'excellence du nail art et le soin de la manucure russe au cœur de Paris.",
+  title: "Lara Cristina | Nail Designer — Villiers-sur-Marne 94350",
+  description: "Lara Cristina — Nail Designer. Manucure, semi-permanent, blindagem, alongamento, banho de gel e nail art. 05 Route de Combault, Villiers-sur-Marne.",
 };
 
 export default function RootLayout({
