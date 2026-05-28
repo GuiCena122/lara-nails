@@ -9,8 +9,8 @@ import { toast } from 'sonner'
 interface Message { id: number; text: string; sent: boolean; time: string }
 interface Contact { id: number; handle: string; lastMsg: string; time: string; unread: number; avatar: string; messages: Message[] }
 
-const init: Contact[] = [
-  { id: 1, handle: '@ana_nails_fan', lastMsg: 'Je voudrais agender...', time: '12:30', unread: 2, avatar: 'A', messages: [
+const INITIAL: Contact[] = [
+  { id: 1, handle: '@ana_nails_fan', lastMsg: 'Je voudrais agender...', time: '12:30', unread: 0, avatar: 'A', messages: [
     { id: 1, text: "Bonjour Lara! J'adore votre travail 😍", sent: false, time: '12:20' },
     { id: 2, text: "Merci Ana! C'est très gentil.", sent: true, time: '12:25' },
     { id: 3, text: 'Je voudrais agender un Allongement Gel pour samedi.', sent: false, time: '12:30' },
@@ -25,13 +25,27 @@ const init: Contact[] = [
   ]},
 ]
 
+function loadContacts(): Contact[] {
+  if (typeof window === 'undefined') return INITIAL
+  try {
+    const raw = localStorage.getItem('lara-inbox')
+    if (raw) return JSON.parse(raw)
+  } catch { /* ignore */ }
+  return INITIAL
+}
+
 export default function InboxPage() {
-  const [cts, setCts] = useState(init)
+  const [cts, setCts] = useState<Contact[]>(loadContacts)
   const [sel, setSel] = useState(1)
   const [input, setInput] = useState('')
   const [sterm, setSterm] = useState('')
   const [view, setView] = useState<'list'|'chat'>('list')
   const router = useRouter()
+
+  const save = (updated: Contact[]) => {
+    setCts(updated)
+    localStorage.setItem('lara-inbox', JSON.stringify(updated))
+  }
 
   const contact = cts.find(c => c.id === sel) || cts[0]
   const filtered = useMemo(() => cts.filter(c => c.handle.toLowerCase().includes(sterm.toLowerCase())), [cts, sterm])
@@ -40,7 +54,7 @@ export default function InboxPage() {
   const send = () => {
     const t = input.trim(); if (!t) return
     const now = new Date(); const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
-    setCts(prev => prev.map(c => c.id === sel ? { ...c, messages: [...c.messages, { id: Date.now(), text: t, sent: true, time }], lastMsg: t, time, unread: 0 } : c))
+    save(cts.map(c => c.id === sel ? { ...c, messages: [...c.messages, { id: Date.now(), text: t, sent: true, time }], lastMsg: t, time, unread: 0 } : c))
     setInput('')
   }
 
@@ -60,7 +74,7 @@ export default function InboxPage() {
         </div>
         <div className="flex-1 overflow-auto">
           {filtered.map(c => (
-            <div key={c.id} onClick={() => { setCts(prev => prev.map(x => x.id === c.id ? { ...x, unread: 0 } : x)); setSel(c.id); setView('chat') }}
+            <div key={c.id} onClick={() => { save(cts.map(x => x.id === c.id ? { ...x, unread: 0 } : x)); setSel(c.id); setView('chat') }}
               className={cn('p-3 flex items-center gap-3 cursor-pointer transition-all border-l-2', sel === c.id ? 'bg-[#e76f51]/10 border-[#e76f51]' : 'border-transparent hover:bg-white/5')}>
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center font-bold text-white relative shrink-0 text-sm">{c.avatar}<div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-[#251f1f] rounded-full" /></div>
               <div className="flex-1 min-w-0">

@@ -19,6 +19,42 @@ const DEFAULT: DayS[] = [
   { day: 'Dimanche', open: '—', close: '—', active: false },
 ]
 
+function SecurityTab() {
+  const supabase = createClient()
+  const [currentPw, setCurrentPw] = useState('')
+  const [newPw, setNewPw] = useState('')
+  const [updating, setUpdating] = useState(false)
+
+  const changePassword = async () => {
+    if (!currentPw || !newPw) { toast.error('Remplissez les deux champs.'); return }
+    if (newPw.length < 6) { toast.error('6 caractères minimum.'); return }
+    setUpdating(true)
+    const { error } = await supabase.auth.updateUser({ password: newPw })
+    if (error) {
+      toast.error(error.message)
+    } else {
+      toast.success('Mot de passe mis à jour !')
+      setCurrentPw('')
+      setNewPw('')
+    }
+    setUpdating(false)
+  }
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-dark p-6 rounded-2xl border border-white/5 space-y-4">
+      <h3 className="font-serif font-bold">Sécurité</h3>
+      <div className="space-y-3">
+        <div className="space-y-1.5"><label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Mot de passe actuel</label><input type="password" value={currentPw} onChange={e => setCurrentPw(e.target.value)} placeholder="••••••••" className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]" /></div>
+        <div className="space-y-1.5"><label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Nouveau mot de passe</label><input type="password" value={newPw} onChange={e => setNewPw(e.target.value)} placeholder="6 caractères minimum" className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]" /></div>
+        <button onClick={changePassword} disabled={updating} className="px-5 py-3 bg-[#e76f51] text-white rounded-xl font-bold text-sm hover:scale-[1.02] transition-all disabled:opacity-50 flex items-center gap-2">
+          {updating ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : null}
+          Changer le mot de passe
+        </button>
+      </div>
+    </motion.div>
+  )
+}
+
 const tabs = [
   { id: 'salon', label: 'Studio', icon: Store },
   { id: 'profile', label: 'Profil', icon: User },
@@ -149,16 +185,7 @@ export default function SettingsPage() {
             </motion.div>
           )}
 
-          {tab === 'security' && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-dark p-6 rounded-2xl border border-white/5 space-y-4">
-              <h3 className="font-serif font-bold">Sécurité</h3>
-              <div className="space-y-3">
-                <div className="space-y-1.5"><label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Mot de passe actuel</label><input type="password" placeholder="••••••••" className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]" /></div>
-                <div className="space-y-1.5"><label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Nouveau mot de passe</label><input type="password" placeholder="••••••••" className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm outline-none focus:border-[#e76f51]" /></div>
-                <button onClick={() => toast.success('Mot de passe mis à jour !')} className="px-5 py-3 bg-[#e76f51] text-white rounded-xl font-bold text-sm hover:scale-[1.02] transition-all">Changer le mot de passe</button>
-              </div>
-            </motion.div>
-          )}
+          {tab === 'security' && <SecurityTab />}
 
           {tab === 'billing' && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-dark p-6 rounded-2xl border border-white/5 space-y-4">
